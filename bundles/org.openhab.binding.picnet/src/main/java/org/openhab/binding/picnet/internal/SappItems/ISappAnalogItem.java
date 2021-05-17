@@ -10,15 +10,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.picnet.internal;
+package org.openhab.binding.picnet.internal.SappItems;
 
 /**
- * The {@link PicnetConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link ISappAnalogItem} interface rapresents a generic analog items which can store a numerical value
  *
  * @author Davide Stefani - Initial contribution
  */
-public class PicnetConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+public interface ISappAnalogItem {
+
+    void updateAnalogValue(Integer value);
+
+    String getAnalogValue();
+
+    boolean hasChanged();
+
+    String getItemString();
 }

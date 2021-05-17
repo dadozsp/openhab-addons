@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Component;
 @Component(configurationPid = "binding.picnet", service = ThingHandlerFactory.class)
 public class PicnetHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_SAMPLE);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(MASTER, OUTPUT, INPUT, VIRTUAL);
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -46,7 +46,9 @@ public class PicnetHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (THING_TYPE_SAMPLE.equals(thingTypeUID)) {
+        if (MASTER.equals(thingTypeUID) || OUTPUT.equals(thingTypeUID) || INPUT.equals(thingTypeUID)
+                || VIRTUAL.equals(thingTypeUID)) {
+
             return new PicnetHandler(thing);
         }
 

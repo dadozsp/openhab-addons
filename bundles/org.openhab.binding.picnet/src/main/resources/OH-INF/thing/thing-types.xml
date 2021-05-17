@@ -4,43 +4,50 @@
 	xmlns:thing="https://openhab.org/schemas/thing-description/v1.0.0"
 	xsi:schemaLocation="https://openhab.org/schemas/thing-description/v1.0.0 https://openhab.org/schemas/thing-description-1.0.0.xsd">
 
-	<!-- Sample Thing Type -->
-	<thing-type id="sample">
-		<!-- Comment this in for Things which need a Bridge to function.
-			<supported-bridge-type-refs>
-			<bridge-type-ref id="PicnetBridge" />
-			</supported-bridge-type-refs>
-		-->
-
-		<label>Picnet Binding Thing</label>
-		<description>Sample thing for Picnet Binding</description>
-
-		<channels>
-			<channel id="channel1" typeId="sample-channel"/>
-		</channels>
+	<thing-type id="pnmas">
+		<label>pnmas</label>
+		<description>Sinthesi PN MAS</description>
 
 		<config-description>
-			<parameter name="hostname" type="text" required="true">
-				<context>network-address</context>
-				<label>Hostname</label>
-				<description>Hostname or IP address of the device</description>
+			<parameter name="ip" type="text" required="true">
+				<context>Master ip address</context>
+				<label>Ip</label>
+				<description>IP address of the master</description>
 			</parameter>
-			<parameter name="password" type="text" required="true">
-				<context>password</context>
-				<label>Password</label>
-				<description>Passwort to access the device</description>
+			<parameter name="port" type="text" required="true">
+				<context>port</context>
+				<label>Port</label>
+				<description>Port used by the master</description>
 			</parameter>
-			<parameter name="refreshInterval" type="integer" unit="s" min="1">
-				<label>Refresh Interval</label>
-				<description>Interval the device is polled in sec.</description>
+			<parameter name="pollInterval" type="integer" unit="ms" min="100">
+				<label>Polling interval</label>
+				<description>Interval the device is polled in milliseconds.</description>
 			</parameter>
 		</config-description>
 	</thing-type>
 
-	<!-- Sample Channel Type -->
-	<channel-type id="sample-channel">
-		<item-type>Number:Temperature</item-type>
-		<label>Example Temperature</label><!-- Use uppercase words, except prepositions. 2-3 words, max 25 chars -->
-		<description>Sample channel for Picnet Binding</description>
-	</channel-type>
+	<thing-type id="out">
+		<label>out</label>
+		<description>Sinthesi module output</description>
+		<channel-groups>
+			<channel-group id="B" typeId="B"/>
+		</channel-groups>
+	</thing-type>
+
+	<thing-type id="inp">
+		<label>inp</label>
+		<description>Sinthesi module input</description>
+		<channel-groups>
+			<channel-group id="B" typeId="B"/>
+		</channel-groups>
+	</thing-type>
+
+	<thing-type id="virt">
+		<label>virt</label>
+		<description>Sinthesi virtual variable</description>
+		<channel-groups>
+			<channel-group id="B" typeId="B"/>
+		</channel-groups>
+	</thing-type>
+
 </thing:thing-descriptions>

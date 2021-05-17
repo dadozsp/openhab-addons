@@ -26,9 +26,24 @@ public class PicnetBindingConstants {
 
     private static final String BINDING_ID = "picnet";
 
+    public static final String MASTER_TYPE = "pnmas";
+    public static final String OUT_TYPE = "O";
+    public static final String INP_TYPE = "I";
+    public static final String VIRT_TYPE = "V";
+
     // List of all Thing Type UIDs
-    public static final ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
+    public static final ThingTypeUID MASTER = new ThingTypeUID(BINDING_ID, "pnmas");
+    public static final ThingTypeUID OUTPUT = new ThingTypeUID(BINDING_ID, "out");
+    public static final ThingTypeUID INPUT = new ThingTypeUID(BINDING_ID, "inp");
+    public static final ThingTypeUID VIRTUAL = new ThingTypeUID(BINDING_ID, "virt");
 
     // List of all Channel ids
-    public static final String CHANNEL_1 = "channel1";
+    public static final String DIGITAL_CHANNEL = "bit";
+    public static final String ANALOG_CHANNEL = "word";
+
+    // List of supported items
+    public static final String SWITCH = "SW";
+    public static final String CONTACT = "CT";
+    public static final String NUMBER = "NB";
+    public static final String ROLLER = "RS";
 }

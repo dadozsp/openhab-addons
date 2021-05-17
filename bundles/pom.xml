@@ -38,11 +38,9 @@
     <module>org.openhab.io.hueemulation</module>
         
     <module>org.openhab.io.imperihome</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.io.metrics</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.io.neeo</module>
         
     <module>org.openhab.io.openhabcloud</module>
@@ -154,11 +152,9 @@
     <module>org.openhab.binding.coronastats</module>
         
     <module>org.openhab.binding.daikin</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.dali</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.danfossairunit</module>
         
     <module>org.openhab.binding.darksky</module>
@@ -188,11 +184,9 @@
     <module>org.openhab.binding.dwdunwetter</module>
         
     <module>org.openhab.binding.ecobee</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.ecotouch</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.elerotransmitterstick</module>
         
     <module>org.openhab.binding.energenie</module>
@@ -200,11 +194,9 @@
     <module>org.openhab.binding.enigma2</module>
         
     <module>org.openhab.binding.enocean</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.enphase</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.enturno</module>
         
     <module>org.openhab.binding.epsonprojector</module>
@@ -268,11 +260,9 @@
     <module>org.openhab.binding.heos</module>
         
     <module>org.openhab.binding.homematic</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.homewizard</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.hpprinter</module>
         
     <module>org.openhab.binding.http</module>
@@ -356,11 +346,9 @@
     <module>org.openhab.binding.luftdateninfo</module>
         
     <module>org.openhab.binding.lutron</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.luxtronikheatpump</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.magentatv</module>
         
     <module>org.openhab.binding.mail</module>
@@ -494,6 +482,7 @@
     <module>org.openhab.binding.pentair</module>
         
     <module>org.openhab.binding.phc</module>
+
     <module>org.openhab.binding.picnet</module>
         
     <module>org.openhab.binding.pilight</module>
@@ -517,11 +506,9 @@
     <module>org.openhab.binding.pushbullet</module>
         
     <module>org.openhab.binding.pushover</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.qbus</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.radiothermostat</module>
         
     <module>org.openhab.binding.regoheatpump</module>
@@ -529,11 +516,9 @@
     <module>org.openhab.binding.revogi</module>
         
     <module>org.openhab.binding.remoteopenhab</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.resol</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.rfxcom</module>
         
     <module>org.openhab.binding.rme</module>
@@ -645,11 +630,9 @@
     <module>org.openhab.binding.urtsi</module>
         
     <module>org.openhab.binding.valloxmv</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.vdr</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.vektiva</module>
         
     <module>org.openhab.binding.velbus</module>
@@ -657,11 +640,9 @@
     <module>org.openhab.binding.velux</module>
         
     <module>org.openhab.binding.venstarthermostat</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.ventaair</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.verisure</module>
         
     <module>org.openhab.binding.vigicrues</module>
@@ -673,11 +654,9 @@
     <module>org.openhab.binding.weathercompany</module>
         
     <module>org.openhab.binding.weatherunderground</module>
-<<<<<<< Updated upstream
+
     <module>org.openhab.binding.webthing</module>
-=======
-        
->>>>>>> Stashed changes
+
     <module>org.openhab.binding.wemo</module>
         
     <module>org.openhab.binding.wifiled</module>
@@ -744,7 +723,7 @@
   </properties>
     
   <dependencies>
-        
+
     <dependency>
             
       <groupId>org.lastnpe.eea</groupId>

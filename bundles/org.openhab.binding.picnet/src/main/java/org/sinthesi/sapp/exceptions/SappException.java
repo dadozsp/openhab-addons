@@ -10,15 +10,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.picnet.internal;
+package org.sinthesi.sapp.exceptions;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link PicnetConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link SappException} class contains a generic SappException
  *
  * @author Davide Stefani - Initial contribution
  */
-public class PicnetConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+@NonNullByDefault
+public class SappException extends Exception {
+
+    public SappException() {
+        super();
+    }
+
+    public SappException(String message) {
+        super(message);
+    }
 }

@@ -10,15 +10,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.picnet.internal;
+package org.openhab.binding.picnet.internal.models;
 
 /**
- * The {@link PicnetConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link CommandQueue} is responsible for storing received commands in an orderly manner
  *
  * @author Davide Stefani - Initial contribution
  */
-public class PicnetConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+public class CommandQueue {
+    public Class<?> command;
+    public int address;
+    public int value;
+
+    public CommandQueue(Class<?> command, int address, int value) {
+        this.command = command;
+        this.address = address;
+        this.value = value;
+    }
 }
