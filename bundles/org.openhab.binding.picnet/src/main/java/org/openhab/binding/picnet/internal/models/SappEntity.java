@@ -129,7 +129,8 @@ public class SappEntity {
         try {
             this.sapp.sappSetVirtual(addr, value);
         } catch (IOException | SappException e) {
-            logger.error("Errore set variabile {}", addr);
+            logger.error("Error setting variable {}", addr);
+            logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
         }
     }
 
@@ -188,6 +189,7 @@ public class SappEntity {
                 sapp.refreshAndRetry();
             } catch (IOException ioException) {
                 logger.error("Error on connection refresh");
+                logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
             }
             logger.warn("Error on input update: {}", e.getMessage());
         }
@@ -205,7 +207,7 @@ public class SappEntity {
                     }
                 } else {
                     usedVirtual.put(k, sapp.sappGetVirtual(k));
-                    logger.info("First value: {}->{}", k, usedVirtual.get(k));
+                    logger.debug("First value: {}->{}", k, usedVirtual.get(k));
                 }
             }
         } catch (Exception e) {
@@ -213,6 +215,7 @@ public class SappEntity {
                 sapp.refreshAndRetry();
             } catch (IOException ioException) {
                 logger.error("Error on connection refresh");
+                logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
             }
             logger.warn("Error on virtual update: {}", e.getMessage());
         }
@@ -245,6 +248,8 @@ public class SappEntity {
                     if (sappDigitalItems.get(id) != null) {
                         sappDigitalItems.get(id).updateDigitalValue(usedVirtual.get(addr), bit);
                     }
+                default:
+                    logger.warn("Unknown channel type received: {}", channelKind[0]);
             }
         }
 
@@ -266,17 +271,19 @@ public class SappEntity {
                     if (sappAnalogItems.get(id) != null) {
                         sappAnalogItems.get(id).updateAnalogValue(usedVirtual.get(addr));
                     }
+                default:
+                    logger.warn("Unknown channel type received: {}", channelKind[0]);
             }
         }
     }
 
     public void addDigitalSappItem(ISappDigitalItem item, ChannelUID channelUuid) {
-        logger.info("Added digital item {} ", item.getItemString());
+        logger.debug("Added digital item {} ", item.getItemString());
         sappDigitalItems.put(channelUuid, item);
     }
 
     public void addAnalogSappItem(ISappAnalogItem item, ChannelUID channelUuid) {
-        logger.info("Added digital item {} ", item.getItemString());
+        logger.debug("Added digital item {} ", item.getItemString());
         sappAnalogItems.put(channelUuid, item);
     }
 

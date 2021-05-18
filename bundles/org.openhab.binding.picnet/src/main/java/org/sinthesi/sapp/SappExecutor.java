@@ -71,7 +71,9 @@ public class SappExecutor {
                 throw new SappException();
             }
         } catch (IOException | SappException e) {
-            throw new IOException(e.getMessage());
+            logger.error("Error while running a command");
+            logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
+            throw new IOException();
         } finally {
             connection.SappOEDisconnect();
         }
@@ -81,7 +83,7 @@ public class SappExecutor {
         if (command != null) {
             execCommand(connection);
         } else {
-            logger.warn("No command set for execution");
+            logger.error("No command set for execution");
             throw new SappException();
         }
     }
@@ -117,18 +119,18 @@ public class SappExecutor {
             returnCode = readSingleByte(selector);
 
             if (returnCode == SappOECode.NAK) {
-                logger.warn("NAK received");
+                logger.warn("Communication error: NAK received");
                 throw new SappException();
             }
             if (returnCode != SappOECode.ACK) {
-                logger.warn("Unknown return code received");
+                logger.warn("Communication error: Unknown return code received");
                 throw new SappException();
             }
 
             byte preamble = readSingleByte(selector);
 
             if (preamble != SappOECode.STX) {
-                logger.warn("Invalid preamble received");
+                logger.warn("Communication error: Invalid preamble received");
                 throw new SappException();
             }
 
@@ -152,18 +154,20 @@ public class SappExecutor {
             }
 
             if (!sappBuffer.isChecksumValid((checksum[0] << 8) + checksum[1] - commandStatus)) {
-                logger.warn("Invalid checksum received");
+                logger.warn("Communication error: Invalid checksum received");
                 throw new SappException();
             }
             command.setResponse(new SappResponse(commandStatus, sappBuffer.toArray()));
         } catch (IOException | SappException e) {
-            System.out.println(e.getMessage());
+            logger.error("Communication error: Error while reading the sapp response");
+            logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
         } finally {
             if (selector != null) {
                 try {
                     selector.close();
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    logger.error("Error while closing the selector");
+                    logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
                 }
             }
         }
@@ -180,7 +184,7 @@ public class SappExecutor {
 
             if (selectionKey.isReadable()) {
                 if (channel.read(buffer) <= 0) {
-                    logger.warn("Response not available");
+                    logger.warn("Communication error: Response not available");
                     throw new IOException();
                 }
             }
@@ -188,7 +192,7 @@ public class SappExecutor {
             buffer.flip();
             return buffer.get();
         } else {
-            logger.warn("Timeout expired");
+            logger.warn("Communication error: Timeout expired");
             throw new IOException();
         }
     }

@@ -62,7 +62,8 @@ public class Sapp implements AutoCloseable {
 
     public Integer sappGetInput(int addr) throws SappException, IOException {
         if (addr < 0 || addr > 250) {
-            throw new SappException("Module address not valid");
+            logger.warn("Invalid module address: {}", addr);
+            throw new SappException();
         }
         GetInput command = new GetInput((byte) addr);
         executor.setCommand(command);
@@ -72,7 +73,8 @@ public class Sapp implements AutoCloseable {
 
     public Integer sappGetOutput(int addr) throws SappException, IOException {
         if (addr < 0 || addr > 250) {
-            throw new SappException("Module address is not valid");
+            logger.warn("Invalid module address: {}", addr);
+            throw new SappException();
         }
         GetOutput command = new GetOutput((byte) addr);
 
@@ -83,7 +85,8 @@ public class Sapp implements AutoCloseable {
 
     public Integer sappGetVirtual(int addr) throws SappException, IOException {
         if (addr < 0 || addr > 2500) {
-            throw new SappException("Variable address not valid");
+            logger.warn("Invalid virtual variable address: {}", addr);
+            throw new SappException();
         }
         GetVirtual command = new GetVirtual(addr);
 
@@ -94,7 +97,8 @@ public class Sapp implements AutoCloseable {
 
     public void sappSetVirtual(int addr, int value) throws SappException, IOException {
         if (addr < 0 || addr > 2500) {
-            throw new SappException("Variable address not valid");
+            logger.warn("Invalid virtual variable address: {}", addr);
+            throw new SappException();
         }
         SetVirtual command = new SetVirtual(addr, value);
 
@@ -173,6 +177,7 @@ public class Sapp implements AutoCloseable {
     }
 
     public void refreshAndRetry() throws IOException {
+        logger.debug("Connection refreshed");
         this.connection.SappOEDisconnect();
         this.connection.SappOEConnect();
     }

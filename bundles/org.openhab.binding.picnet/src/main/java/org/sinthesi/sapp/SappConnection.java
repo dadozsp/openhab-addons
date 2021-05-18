@@ -31,6 +31,7 @@ public class SappConnection implements AutoCloseable {
     private SocketChannel masSocket;
     private int attempt = 0;
     private final static int ATTEMPT_LIMIT = 500;
+    private final static int RETRY_LIMIT = 3;
     private boolean unableToConnect = false;
     private final Logger logger = LoggerFactory.getLogger(PicnetHandler.class);
 
@@ -55,23 +56,30 @@ public class SappConnection implements AutoCloseable {
             masSocket = SocketChannel.open();
             masSocket.configureBlocking(false);
             masSocket.connect(new InetSocketAddress(masAddress, masPort));
-            while (!masSocket.finishConnect()) {
-                attempt++;
-                Thread.sleep(10);
-                if (attempt > ATTEMPT_LIMIT) {
-                    logger.warn("Reached attemp limit");
-                    unableToConnect = true;
+            for (int i = 0; i < RETRY_LIMIT; i++) {
+                while (!masSocket.finishConnect()) {
+                    attempt++;
+                    Thread.sleep(10);
+                    if (attempt > ATTEMPT_LIMIT) {
+                        logger.warn("Reached connection attempt limit {} out of {}", i, RETRY_LIMIT);
+                        unableToConnect = true;
+                        break;
+                    }
+                }
+
+                if (!unableToConnect) {
                     break;
                 }
             }
 
             if (unableToConnect) {
                 SappOEDisconnect();
-                logger.error("Impossibile connettersi all'idirizzo {}:{}", this.masAddress, this.masPort);
+                logger.error("Unable to connect with host {}:{}", this.masAddress, this.masPort);
             }
 
         } catch (Exception e) {
-            logger.error("Impossibile aprire la connessione con {}, Exception: {}", this.masAddress, e.toString());
+            logger.error("Unable to connect with host {}:{}", this.masAddress, this.masPort);
+            logger.debug("Cause: {}\nException: {}", e.getCause(), e.getStackTrace());
             masSocket = null;
         }
     }
@@ -81,7 +89,8 @@ public class SappConnection implements AutoCloseable {
             try {
                 masSocket.close();
             } catch (IOException e) {
-                logger.error("Imposibile chiudure la connessione con {}", this.masAddress);
+                logger.error("Unable to connect with host {}:{}", this.masAddress, this.masPort);
+                logger.debug("Cause: {}\nException: {}", e.getCause(), e.getStackTrace());
             } finally {
                 masSocket = null;
             }

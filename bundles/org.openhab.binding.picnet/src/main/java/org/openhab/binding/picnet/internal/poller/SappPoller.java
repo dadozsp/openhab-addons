@@ -83,7 +83,8 @@ public class SappPoller {
                     runQueuedCommands();
                     Thread.sleep(pollerTiming);
                 } catch (Exception e) {
-                    logger.error("{}->{}", e, Arrays.toString(e.getStackTrace()));
+                    logger.error("Error while polling for updates");
+                    logger.debug("Cause: {}\nStack: {}", e.getCause(), e.getStackTrace());
                 }
             }
         }
@@ -111,6 +112,8 @@ public class SappPoller {
                     handler.updateItemState(id, (digitalItems.get(id).getDigitalValue()) ? PercentType.valueOf("100")
                             : PercentType.valueOf("0"));
                 }
+            } else {
+                logger.warn("Item with channel {} not recognized", id);
             }
         }
     }
@@ -138,7 +141,7 @@ public class SappPoller {
                         entity.getSapp().sappSetVirtual(elem.address, elem.value);
                         c.remove();
                     } catch (IOException | SappException e) {
-                        logger.error("Error while running a command");
+                        logger.error("Error while running queued command");
                     }
                 }
             }

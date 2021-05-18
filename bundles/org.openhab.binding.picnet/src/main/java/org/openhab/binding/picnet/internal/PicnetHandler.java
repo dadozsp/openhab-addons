@@ -101,24 +101,23 @@ public class PicnetHandler extends BaseThingHandler {
 
         updateStatus(ThingStatus.UNKNOWN);
         assert config != null;
-        logger.info("Config valid");
-        logger.info("thing info: uuid; {}, label: {}, Id: {}", this.getThing().getUID(), this.getThing().getLabel(),
+        logger.debug("thing info: uuid; {}, label: {}, Id: {}", this.getThing().getUID(), this.getThing().getLabel(),
                 this.getThing().getUID().getId());
 
         if (Objects.equals(this.getThing().getLabel(), MASTER_TYPE)) {
             try {
                 entity.setSapp(new Sapp(config.ip, Integer.parseInt(config.port), 5000));
             } catch (IOException e) {
-                logger.error("Error during comunication {}", e.getMessage());
+                logger.error("Error during comunication");
+                logger.debug("Cause:{}\nException: {}", e.getCause(), e.getStackTrace());
             }
             updateStatus(ThingStatus.ONLINE);
             int pollerTiming = config.pollInterval;
             pollerClass = new SappPoller(entity, pollerTiming, this);
             watchdog = watchdogScheduler.scheduleWithFixedDelay(this::pollWatcher, 0, 1, TimeUnit.SECONDS);
             job = scheduler.schedule(pollerClass::statusPoller, 0, TimeUnit.MILLISECONDS);
-            logger.info("Poller created");
-            logger.info("Connected with PN MAS");
-            logger.info("Channel number: {}", getThing().getChannels().size());
+            logger.debug("Connected with PN MAS");
+            logger.debug("Channel number: {}", getThing().getChannels().size());
             entity.purgeEntity();
             for (Channel c : getThing().getChannels()) {
                 this.channelLinked(c.getUID());
@@ -161,7 +160,7 @@ public class PicnetHandler extends BaseThingHandler {
                 res.downBit = Integer.parseInt(cfgParam[4]);
                 break;
             default:
-                logger.error("Item type {} not recognized", res.itemType);
+                logger.warn("Item type {} not recognized", res.itemType);
         }
 
         return res;
@@ -178,15 +177,15 @@ public class PicnetHandler extends BaseThingHandler {
         switch (cfg.channelKind) {
             case OUT_TYPE:
                 entity.tryAddOutput(cfg.statusAddr);
-                logger.info("Added output");
+                logger.debug("Added output");
                 break;
             case INP_TYPE:
                 entity.tryAddInput(cfg.statusAddr);
-                logger.info("Added input");
+                logger.debug("Added input");
                 break;
             case VIRT_TYPE:
                 entity.tryAddVirtual(cfg.statusAddr);
-                logger.info("Added virtual");
+                logger.debug("Added virtual");
                 break;
             default:
                 validKind = false;
@@ -215,11 +214,6 @@ public class PicnetHandler extends BaseThingHandler {
 
     public void updateThingStatus(ThingStatus status) {
         updateStatus(status);
-    }
-
-    @Override
-    public void thingUpdated(Thing thing) {
-        logger.info("Thing update called for {}", thing.getUID());
     }
 
     private void pollWatcher() {
