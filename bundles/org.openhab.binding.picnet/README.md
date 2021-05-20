@@ -1,51 +1,77 @@
 # Picnet Binding
+![LogoSinthesi](doc/LogoSinthesi.png)
+_The picnet binding  can be used to interact with the Sinthesi picnet home automation enviroment._
+_The binding allows the user to connect to a PN MAS device (version 7 and up recommended, for previus model a PN TCP/IP module may be required) and, along with the program on the PN MAS itself allows the user to freely control all aspects of their home automation systems._
 
-_Give some details about what this binding is meant for - a protocol, system, specific device._
-
-_If possible, provide some resources like pictures, a video, etc. to give an impression of what can be done with this binding. You can place such resources into a `doc` folder next to this README.md._
 
 ## Supported Things
 
-_Please describe the different supported things / devices within this section._
-_Which different types are supported, which models were tested etc.?_
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
-
-## Discovery
-
-_Describe the available auto-discovery features here. Mention for what it works and what needs to be kept in mind when using it._
-
-## Binding Configuration
-
-_If your binding requires or supports general configuration settings, please create a folder ```cfg``` and place the configuration file ```<bindingId>.cfg``` inside it. In this section, you should link to this file and provide some information about the options. The file could e.g. look like:_
-
-```
-# Configuration for the Picnet Binding
-#
-# Default secret key for the pairing of the Picnet Thing.
-# It has to be between 10-40 (alphanumeric) characters.
-# This may be changed by the user for security reasons.
-secret=openHABSecret
-```
-
-_Note that it is planned to generate some part of this based on the information that is available within ```src/main/resources/OH-INF/binding``` of your binding._
-
-_If your binding does not offer any generic configurations, you can remove this section completely._
+![PN MAS](doc/pnmas.jpg)
+![PN EASY](doc/PN-EASY.jpg)
+![PN LIGHTON](doc/PN-LIGHTON.jpg)
+_This binding supports all of Sinthesi control units (PN MAS, PN EASY, PN LIGHTON and PN REC) that have an onboard ethernet port or that are connected to your local network via a PN TCP/IP module_
 
 ## Thing Configuration
 
-_Describe what is needed to manually configure a thing, either through the UI or via a thing-file. This should be mainly about its mandatory and optional configuration parameters. A short example entry for a thing file can help!_
+_The thing has the following parameters_
 
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+|Name           |Type  |Description                                                                                         |Accepted value                                                             |
+|---------------|------|----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+|Ip             |String|The ip address of the desired control unit                                                          |Any well formed ip address or host name (only supported by version 8 and up|
+|Port           |String|The port used to communicate, usually 7001 or 4001 for PN TCP/IP devices                            |Any usable port number                                                     |
+|pollingInterval|Int   |The interval in which the control unit is polled in milliseconds for new statuses, default is 100 ms|Any integer value                                                          |
+
 
 ## Channels
 
-_Here you should provide information about available channel types, what their meaning is and how they can be used._
+_In this binding there are no pre-defined channel, and it's up to the user to define the used channels._
+_Each item must have a defined channel with the following syntax_
 
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/OH-INF/thing``` of your binding._
+| item          | definition                                        |
+|---------------|---------------------------------------------------|
+| Switch        | Type#AddrBBit-trgAddr-trgBit-onValue-offValue-SW  |
+| Contact       | Type#AddrBBit-CT                                  |
+| Number        | Type#Addr-NB                                      |
+| Rollershutter | Type#AddrBBit-upAddr-upBit-downAddr-downBit-RS    |
+| Dimmer        | Type#Addr-DM                                      |
 
-| channel  | type   | description                  |
-|----------|--------|------------------------------|
-| control  | Switch | This is the control channel  |
+###Switch 
+_Type: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables_
+_Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables_
+_Bit: The bit for the ON/OFF state, both input output abd virtual have 16 bit for ON/OFF states_
+_trgAddr: The address of the virtal variable that triggers the switch_
+_trgBit: The bit of the virtual variable that triggers the switch_
+_onValue: The value sent after an on command_
+_offValue: The value sent after an off command_
+_SW: item identifier for the switch_
+
+_Note: For now the only value supported for the switch onValue and offValue is 1, it's suggested that the trigger variable gets set by the binding and then is set back to 0_ 
+_by the control unit with a dedicated macro (shown below)_
+
+###Contact
+_Type: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables_
+_Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables_
+_Bit: The bit for the ON/OFF state, both input output abd virtual have 16 bit for ON/OFF states_
+_CT: item identifier for the contact_
+
+###Number
+_Type: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables_
+_Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables_
+_NB: item identifier for the number_
+
+###Rollershutter
+_Type: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables_
+_Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables_
+_upAddr: The address of the variables that moves the roller shutter up_
+_upBit: The bit of the variable that moves the roller shutter up_
+_downAddr: The address of the variables that moves the roller shutter down_
+_downBit: The bit of the variable that moves the roller shutter down_
+_RS: item identifier for the rollershutter_
+
+###Dimmer
+_Type: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables_
+_Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables_
+_DM: item identifier for the rollershutter_
 
 ## Full Example
 
