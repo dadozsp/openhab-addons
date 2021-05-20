@@ -64,17 +64,13 @@ public class PicnetHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.info("ChannelUID: {}", channelUID);
-        logger.info("Command: {}", command);
+        logger.debug("ChannelUID: {}", channelUID);
+        logger.debug("Command: {}", command);
+
         if (entity.getSappDigitalItems().get(channelUID) != null
                 && SWITCH.equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
             SappSwitch item = (SappSwitch) entity.getSappDigitalItems().get(channelUID);
             entity.addToQueue(new CommandQueue(SetVirtual.class, item.trgAddr, (int) Math.pow(2, item.trgBit - 1)));
-
-            // Note: if communication with thing fails for some reason,
-            // indicate that by setting the status with detail information:
-            // updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-            // "Could not control device at IP address x.x.x.x");
         } else if (entity.getSappDigitalItems().get(channelUID) != null
                 && ROLLER.equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
             SappRollershutter roller = (SappRollershutter) entity.getSappDigitalItems().get(channelUID);
@@ -91,6 +87,11 @@ public class PicnetHandler extends BaseThingHandler {
             SappNumber number = (SappNumber) entity.getSappAnalogItems().get(channelUID);
             entity.addToQueue(
                     new CommandQueue(SetVirtual.class, number.valueAddress, Integer.parseInt(command.toString())));
+        } else if (entity.getSappAnalogItems().get(channelUID) != null
+                && DIMMER.equals(entity.getSappAnalogItems().get(channelUID).getItemString())) {
+            SappDimmer dimmer = (SappDimmer) entity.getSappAnalogItems().get(channelUID);
+            entity.addToQueue(new CommandQueue(SetVirtual.class, dimmer.valueAddress,
+                    (int) Math.round(Integer.parseInt(command.toString()) * DIMM_DIVIDER)));
         }
     }
 
@@ -149,6 +150,7 @@ public class PicnetHandler extends BaseThingHandler {
                 res.statusBit = Integer.parseInt(status[1].split("B")[0]);
                 break;
             case NUMBER:
+            case DIMMER:
                 res.statusAddr = Integer.parseInt(status[1]);
                 break;
             case ROLLER:
@@ -170,8 +172,8 @@ public class PicnetHandler extends BaseThingHandler {
     public void channelLinked(ChannelUID channelUID) {
         ChannelConfig cfg = getConfigFromChannelStr(channelUID);
         boolean validKind = true;
-        logger.info("Channel linked {}", channelUID);
-        logger.info("Item: {} - {} - {} - {} - {} - {} - {}", cfg.statusAddr, cfg.statusBit, cfg.upAddr, cfg.upBit,
+        logger.debug("Channel linked {}", channelUID);
+        logger.debug("Item: {} - {} - {} - {} - {} - {} - {}", cfg.statusAddr, cfg.statusBit, cfg.upAddr, cfg.upBit,
                 cfg.downAddr, cfg.downBit, cfg.itemType);
 
         switch (cfg.channelKind) {
@@ -204,6 +206,8 @@ public class PicnetHandler extends BaseThingHandler {
             } else if (cfg.itemType.equalsIgnoreCase(ROLLER)) {
                 entity.addDigitalSappItem(new SappRollershutter(cfg.statusAddr, cfg.statusBit, cfg.upAddr, cfg.upBit,
                         cfg.downAddr, cfg.downBit), channelUID);
+            } else if (cfg.itemType.equalsIgnoreCase(DIMMER)) {
+                entity.addAnalogSappItem(new SappDimmer(cfg.statusAddr), channelUID);
             }
         }
     }

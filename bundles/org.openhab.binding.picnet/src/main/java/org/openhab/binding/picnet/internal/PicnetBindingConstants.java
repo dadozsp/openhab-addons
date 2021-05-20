@@ -45,4 +45,7 @@ public class PicnetBindingConstants {
     public static final String CONTACT = "CT";
     public static final String NUMBER = "NB";
     public static final String ROLLER = "RS";
+    public static final String DIMMER = "DM";
+
+    public static final double DIMM_DIVIDER = 2.55;
 }

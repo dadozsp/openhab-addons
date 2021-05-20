@@ -248,8 +248,9 @@ public class SappEntity {
                     if (sappDigitalItems.get(id) != null) {
                         sappDigitalItems.get(id).updateDigitalValue(usedVirtual.get(addr), bit);
                     }
+                    break;
                 default:
-                    logger.warn("Unknown channel type received: {}", channelKind[0]);
+                    logger.warn("Unknown channel type received: {}", Arrays.toString(channelKind));
             }
         }
 
@@ -271,8 +272,9 @@ public class SappEntity {
                     if (sappAnalogItems.get(id) != null) {
                         sappAnalogItems.get(id).updateAnalogValue(usedVirtual.get(addr));
                     }
+                    break;
                 default:
-                    logger.warn("Unknown channel type received: {}", channelKind[0]);
+                    logger.warn("Unknown channel type received: {}", Arrays.toString(channelKind));
             }
         }
     }

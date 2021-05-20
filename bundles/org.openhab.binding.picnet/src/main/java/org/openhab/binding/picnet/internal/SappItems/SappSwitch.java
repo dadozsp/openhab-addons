@@ -26,6 +26,7 @@ public class SappSwitch implements ISappDigitalItem {
     public int trgBit;
     public int onVal;
     public int offVal;
+    public int moduleValue;
     public boolean value;
     private boolean changed;
 
@@ -57,6 +58,7 @@ public class SappSwitch implements ISappDigitalItem {
         boolean newVal = (value & (int) Math.pow(2, bit - 1)) != 0;
         if (newVal != this.value) {
             this.value = newVal;
+            this.moduleValue = value;
             changed = true;
         } else {
             changed = false;
@@ -67,6 +69,10 @@ public class SappSwitch implements ISappDigitalItem {
     public boolean getDigitalValue() {
         changed = false;
         return value;
+    }
+
+    public int getModuleValue() {
+        return moduleValue;
     }
 
     @Override

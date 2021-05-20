@@ -83,7 +83,7 @@ public class SappPoller {
                     Thread.sleep(pollerTiming);
                 } catch (Exception e) {
                     logger.error("Error while polling for updates");
-                    logger.debug("Cause: {}\nStack: {}", e.getCause(), e.getStackTrace());
+                    logger.error("Cause: {}\nStack: {}", e.getCause(), e.getStackTrace());
                 }
             }
         }
@@ -126,6 +126,10 @@ public class SappPoller {
             if (analogItems.get(id) instanceof SappNumber) {
                 if (analogItems.get(id).hasChanged()) {
                     handler.updateItemState(id, DecimalType.valueOf((analogItems.get(id)).getAnalogValue()));
+                }
+            } else if (analogItems.get(id) instanceof SappDimmer) {
+                if (analogItems.get(id).hasChanged()) {
+                    handler.updateItemState(id, PercentType.valueOf(analogItems.get(id).getAnalogValue()));
                 }
             }
         }
