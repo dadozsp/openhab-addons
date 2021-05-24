@@ -75,7 +75,28 @@ _DM: item identifier for the rollershutter_
 
 ## Full Example
 
-_Provide a full usage example based on textual configuration files (*.things, *.items, *.sitemap)._
+###Thing
+_In this file we define both the thing we use and the channel the thing uses_
+```
+picnet:pnmas:1 [ip="192.168.1.113, port="7001", pollInterval=100] {
+    Channels:
+        Switch : O#1B1-1-4-1-1-SW
+        Contact : O#1B1-CT
+        Number : V#2-NB
+        Rollershutter : V#20B3-1100-1-1100-2-RS
+        Dimmer : V#16-DM
+}
+```
+
+###Items
+_In this file we define the items we will use to build our page_
+```
+Switch Item_Name_1 "Item label 1" {channel="picnet:pnmas:1:O#1B1-1-4-1-1-SW"}
+Contact Item_Name_2 "Item label 2" {channel="picnet:pnmas:1:O#1B1-CT"}
+Number Item_Name_3 "Item label 3" {channel="picnet:pnmas:1:V#2-NB"}
+Rollershutter Item_Name_4 "Item label 4" {channel="picnet:pnmas:1:V#20B3-1100-1-1100-2-RS"}
+Dimmer Item_Name_5 "Item label 5" {channel="picnet:pnmas:1:V#16-DM"}
+```
 
 ## Any custom content here!
 
