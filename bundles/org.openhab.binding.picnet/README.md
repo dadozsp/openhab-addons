@@ -25,51 +25,50 @@ _The thing has the following parameters.
 In this binding there are no pre-defined channel, and it's up to the user to define the used channels.
 Each item must have a defined channel with the following syntax.
 
-| item          | definition                                        |
-|---------------|---------------------------------------------------|
-| Switch        | Type#AddrBBit-trgAddr-trgBit-onValue-offValue-SW  |
-| Contact       | Type#AddrBBit-CT                                  |
-| Number        | Type#Addr-NB                                      |
-| Rollershutter | Type#AddrBBit-upAddr-upBit-downAddr-downBit-RS    |
-| Dimmer        | Type#Addr-DM                                      |
+| item          | definition                                                                        |
+|---------------|-----------------------------------------------------------------------------------|
+| Switch        | **Type**#**Addr**B**Bit**-**trgAddr**-**trgBit**-**onValue**-**offValue**-**SW**  |
+| Contact       | **Type**#**Addr**B**Bit**-**CT**                                                  |
+| Number        | **Type**#**Addr**-**NB**                                                          |
+| Rollershutter | **Type**#**Addr**B**Bit**-**upAddr**-**upBit**-**downAddr**-**downBit**-**RS**    |
+| Dimmer        | **Type**#**Addr**-**DM**                                                          |
 
 ### Switch 
-Type: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.
-Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables.
-Bit: The bit for the ON/OFF state, both input output abd virtual have 16 bit for ON/OFF states.
-trgAddr: The address of the virtual variable that triggers the switch.
-trgBit: The bit of the virtual variable that triggers the switch.
-onValue: The value sent after an on command.
-offValue: The value sent after an off command.
-SW: item identifier for the switch.
+**Type**: The address type whic can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.<br/>
+**Addr**: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables.<br/>
+**Bit**: The bit for the ON/OFF state, both input output abd virtual have 16 bit for ON/OFF states.<br/>
+**trgAddr**: The address of the virtual variable that triggers the switch.<br/>
+**trgBit**: The bit of the virtual variable that triggers the switch.<br/>
+**onValue**: The value sent after an on command.<br/>
+**offValue**: The value sent after an off command.<br/>
+**SW**: item identifier for the switch.<br/>
 
-Note: At this moment, the only supported value for the switch onValue and offValue is 1 on both the on and off value, it's suggested that the trigger variable gets set by the binding and then is set back to 0
-by the control unit with a dedicated macro (shown below)
+Note: At this moment, the only supported value for the switch onValue and offValue is 1 on both the on and off value, it's suggested that the trigger variable gets set by the binding and then is set back to 0 by the control unit with a dedicated macro (shown below)
 
 ### Contact
-Type: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.
-Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables.
-Bit: The bit for the ON/OFF state, both input output abd virtual have 16 bit for ON/OFF states.
-CT: item identifier for the contact.
+**Type**: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.<br/>
+**Addr**: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables.<br/>
+**Bit**: The bit for the ON/OFF state, both input output abd virtual have 16 bit for ON/OFF states.<br/>
+**CT**: item identifier for the contact.
 
 ### Number
-Type: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.
-Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables. 
-NB: item identifier for the number. 
+**Type**: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.<br/>
+**Addr**: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables. <br/>
+**NB**: item identifier for the number. <br/>
 
 ### Rollershutter
-Type: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables. 
-Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables. 
-upAddr: The address of the variables that moves the roller shutter up.
-upBit: The bit of the variable that moves the roller shutter up.
-downAddr: The address of the variables that moves the roller shutter down.
-downBit: The bit of the variable that moves the roller shutter down.
-RS: item identifier for the rollershutter.
+**Type**: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables. <br/>
+**Addr**: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables. <br/>
+**upAddr**: The address of the variables that moves the roller shutter up.<br/>
+**upBit**: The bit of the variable that moves the roller shutter up.<br/>
+**downAddr**: The address of the variables that moves the roller shutter down.<br/>
+**downBit**: The bit of the variable that moves the roller shutter down.<br/>
+**RS**: item identifier for the rollershutter.
 
 ### Dimmer
-Type: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.
-Addr: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables.
-DM: item identifier for the rollershutter.
+**Type**: The address type which can be Output (O) and Input (I) for modules and Virtual (V) for virtual variables.<br/>
+**Addr**: The address of the module for Input (I) or Output (O) or the address of the virtual variable (V), this value must be between 1 and 254 for Input and Output and between 1 and 2500 for Virtual variables.<br/>
+**DM**: item identifier for the rollershutter.<br/>
 
 ## Full Example
 
@@ -104,10 +103,8 @@ Macro used in the pns to support the openhab switch.
 |   p_virtualePC   | Virtual variable used by an openhab switch item                |
 |  p_virtualeMemo  | Memory virtual variable used to save the state of p_virtualePC |
 
-The AutoResetFlagPC keep the value of p_virtualePC at the value set by the item for one program cycle on the control unit.
+The AutoResetFlagPC keep the value of p_virtualePC at the value set by the item for one program cycle on the control unit.<br/>
 This macro must be used for all items which toggle an item on or off using a virtual variable
-
-
 
 ```
 MACRO AutoResetFlagPC(p_virtualePC, p_virtualeMemo)
