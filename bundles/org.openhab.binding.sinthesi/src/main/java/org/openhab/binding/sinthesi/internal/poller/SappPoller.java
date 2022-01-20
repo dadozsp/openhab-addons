@@ -108,8 +108,9 @@ public class SappPoller {
                 }
             } else if (digitalItems.get(id) instanceof SappRollershutter) {
                 if (digitalItems.get(id).hasChanged() && pollerActive) {
-                    handler.updateItemState(id, (digitalItems.get(id).getDigitalValue()) ? PercentType.valueOf("100")
-                            : PercentType.valueOf("0"));
+                    handler.updateItemState(id,
+                            (digitalItems.get(id).getDigitalValue()) ? PercentType.valueOf("100")
+                                    : PercentType.valueOf("0"));
                 }
             } else {
                 logger.warn("Item with channel {} not recognized", id);

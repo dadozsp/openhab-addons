@@ -32,7 +32,6 @@ public class Sapp implements AutoCloseable {
     private final SappExecutor executor;
     private boolean initialized;
     private static final int RETRY_NUM = 3;
-    private static final int NO_RESPONSE_LIMIT = 3;
     private final Logger logger = LoggerFactory.getLogger(Sapp.class);
 
     public Sapp() {
