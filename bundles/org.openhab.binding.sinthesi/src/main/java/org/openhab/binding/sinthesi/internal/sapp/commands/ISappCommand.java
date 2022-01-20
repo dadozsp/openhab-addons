@@ -10,15 +10,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal;
+package org.openhab.binding.sinthesi.internal.sapp.commands;
+
+import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 
 /**
- * The {@link SinthesiConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link ISappCommand} interface represents a generic Sapp protocol command
  *
  * @author Davide Stefani - Initial contribution
  */
-public class SinthesiConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+public interface ISappCommand<T> {
+    byte[] getFullCommand();
+
+    void setResponse(SappResponse response);
+
+    SappResponse getResponse();
+
+    T getResponseData();
 }

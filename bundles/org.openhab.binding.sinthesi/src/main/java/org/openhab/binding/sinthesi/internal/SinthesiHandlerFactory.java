@@ -12,8 +12,6 @@
  */
 package org.openhab.binding.sinthesi.internal;
 
-import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.*;
-
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -35,7 +33,8 @@ import org.osgi.service.component.annotations.Component;
 @Component(configurationPid = "binding.sinthesi", service = ThingHandlerFactory.class)
 public class SinthesiHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(THING_TYPE_SAMPLE);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Set.of(SinthesiBindingConstants.MASTER,
+            SinthesiBindingConstants.OUTPUT, SinthesiBindingConstants.INPUT, SinthesiBindingConstants.VIRTUAL);
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -46,7 +45,10 @@ public class SinthesiHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (THING_TYPE_SAMPLE.equals(thingTypeUID)) {
+        if (SinthesiBindingConstants.MASTER.equals(thingTypeUID) || SinthesiBindingConstants.OUTPUT.equals(thingTypeUID)
+                || SinthesiBindingConstants.INPUT.equals(thingTypeUID)
+                || SinthesiBindingConstants.VIRTUAL.equals(thingTypeUID)) {
+
             return new SinthesiHandler(thing);
         }
 

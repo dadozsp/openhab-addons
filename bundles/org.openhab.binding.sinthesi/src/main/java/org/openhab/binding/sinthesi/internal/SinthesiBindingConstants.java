@@ -24,11 +24,28 @@ import org.openhab.core.thing.ThingTypeUID;
 @NonNullByDefault
 public class SinthesiBindingConstants {
 
-    private static final String BINDING_ID = "sinthesi";
+    private static final String BINDING_ID = "Sinthesi";
+
+    public static final String MASTER_TYPE = "pnmas";
+    /* Module Output */
+    public static final String OUT_TYPE = "O";
+    /* Module Input */
+    public static final String INP_TYPE = "I";
+    /* Virtual variable */
+    public static final String VIRT_TYPE = "V";
 
     // List of all Thing Type UIDs
-    public static final ThingTypeUID THING_TYPE_SAMPLE = new ThingTypeUID(BINDING_ID, "sample");
+    public static final ThingTypeUID MASTER = new ThingTypeUID(BINDING_ID, "pnmas");
+    public static final ThingTypeUID OUTPUT = new ThingTypeUID(BINDING_ID, "out");
+    public static final ThingTypeUID INPUT = new ThingTypeUID(BINDING_ID, "inp");
+    public static final ThingTypeUID VIRTUAL = new ThingTypeUID(BINDING_ID, "virt");
 
-    // List of all Channel ids
-    public static final String CHANNEL_1 = "channel1";
+    // List of supported items
+    public static final String SWITCH = "SW";
+    public static final String CONTACT = "CT";
+    public static final String NUMBER = "NB";
+    public static final String ROLLER = "RS";
+    public static final String DIMMER = "DM";
+
+    public static final double DIMM_DIVIDER = 2.55;
 }

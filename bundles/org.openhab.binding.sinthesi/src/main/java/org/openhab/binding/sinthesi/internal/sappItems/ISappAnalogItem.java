@@ -10,15 +10,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal;
+package org.openhab.binding.sinthesi.internal.sappItems;
 
 /**
- * The {@link SinthesiConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link ISappAnalogItem} interface rapresents a generic analog items which can store a numerical value
  *
  * @author Davide Stefani - Initial contribution
  */
-public class SinthesiConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+public interface ISappAnalogItem {
+
+    void updateAnalogValue(Integer value);
+
+    String getAnalogValue();
+
+    boolean hasChanged();
+
+    String getItemString();
 }

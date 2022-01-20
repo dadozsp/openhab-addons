@@ -10,15 +10,20 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal;
+package org.openhab.binding.sinthesi.internal.sappItems;
 
 /**
- * The {@link SinthesiConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link ISappDigitalItem} interface rapresents a generic digital item which can hold only boolean statuses
  *
  * @author Davide Stefani - Initial contribution
  */
-public class SinthesiConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+public interface ISappDigitalItem {
+
+    void updateDigitalValue(int value, int bit);
+
+    boolean getDigitalValue();
+
+    boolean hasChanged();
+
+    String getItemString();
 }

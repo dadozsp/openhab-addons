@@ -13,12 +13,21 @@
 package org.openhab.binding.sinthesi.internal;
 
 /**
- * The {@link SinthesiConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link ChannelConfig} class holds the parameter needed to setup a new channel
  *
  * @author Davide Stefani - Initial contribution
  */
-public class SinthesiConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+public class ChannelConfig {
+    public String channelKind;
+    public int statusAddr;
+    public int statusBit;
+    public int trgAddr;
+    public int trgBit;
+    public int upAddr;
+    public int upBit;
+    public int downAddr;
+    public int downBit;
+    public int onVal;
+    public int offVal;
+    public String itemType;
 }

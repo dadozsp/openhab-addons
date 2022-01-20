@@ -10,15 +10,23 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal;
+package org.openhab.binding.sinthesi.internal.sapp.exceptions;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * The {@link SinthesiConfiguration} class contains fields mapping thing configuration parameters.
+ * The {@link SappException} class contains a generic SappException
  *
  * @author Davide Stefani - Initial contribution
  */
-public class SinthesiConfiguration {
-    public String ip;
-    public String port;
-    public int pollInterval = 100;
+@NonNullByDefault
+public class SappException extends Exception {
+
+    public SappException() {
+        super();
+    }
+
+    public SappException(String message) {
+        super(message);
+    }
 }
