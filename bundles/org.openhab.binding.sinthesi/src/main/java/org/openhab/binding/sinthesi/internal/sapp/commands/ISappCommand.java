@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.sinthesi.internal.sapp.commands;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 
 /**
@@ -19,11 +21,13 @@ import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public interface ISappCommand<T> {
     byte[] getFullCommand();
 
-    void setResponse(SappResponse response);
+    void setResponse(@Nullable SappResponse response);
 
+    @Nullable
     SappResponse getResponse();
 
     T getResponseData();

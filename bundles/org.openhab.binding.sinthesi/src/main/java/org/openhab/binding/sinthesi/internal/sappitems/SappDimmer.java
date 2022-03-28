@@ -10,37 +10,52 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
 
 import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.DIMMER;
 import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.DIMM_DIVIDER;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The {@link SappDimmer} class rapresents a generic dimmer item.
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappDimmer implements ISappAnalogItem {
+    public String type;
     public int valueAddress;
     public String value;
     private boolean changed;
-    private static final Logger logger = LoggerFactory.getLogger(SappDimmer.class);
 
-    public SappDimmer(int valueAddress) {
+    public SappDimmer(String type, int valueAddress) {
+        this.type = type;
         this.valueAddress = valueAddress;
+        value = "";
     }
 
     @Override
-    public void updateAnalogValue(Integer value) {
-        String dimmValue = Integer.toString((int) Math.round(value / DIMM_DIVIDER));
-        if (!dimmValue.equals(this.value)) {
-            this.value = dimmValue;
-            changed = true;
-        } else {
-            changed = false;
+    public int getAddress() {
+        return valueAddress;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public void updateAnalogValue(@Nullable Integer value) {
+        if (value != null) {
+            String dimmValue = Integer.toString((int) Math.round(value / DIMM_DIVIDER));
+            if (!dimmValue.equals(this.value)) {
+                this.value = dimmValue;
+                changed = true;
+            } else {
+                changed = false;
+            }
         }
     }
 
@@ -61,7 +76,7 @@ public class SappDimmer implements ISappAnalogItem {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }

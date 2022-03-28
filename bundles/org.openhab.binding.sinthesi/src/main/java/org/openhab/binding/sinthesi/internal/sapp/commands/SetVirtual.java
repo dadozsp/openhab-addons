@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.sinthesi.internal.sapp.commands;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 import org.openhab.binding.sinthesi.internal.sapp.enums.SappCode;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappByteBuffer;
@@ -23,11 +25,12 @@ import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SetVirtual implements ISappCommand<SappCode> {
     private final byte[] command;
     private final int nVar;
     private final int value;
-    private SappResponse response;
+    private @Nullable SappResponse response;
 
     public SetVirtual(int nVar, int value) {
         this.nVar = nVar;
@@ -38,6 +41,7 @@ public class SetVirtual implements ISappCommand<SappCode> {
         buffer.addRange(SappUtils.getHexAsciiWord(nVar));
         buffer.addRange(SappUtils.getHexAsciiWord(value));
         this.command = buffer.toArray();
+        response = null;
     }
 
     public int getVar() {
@@ -54,12 +58,12 @@ public class SetVirtual implements ISappCommand<SappCode> {
     }
 
     @Override
-    public void setResponse(SappResponse response) {
+    public void setResponse(@Nullable SappResponse response) {
         this.response = response;
     }
 
     @Override
-    public SappResponse getResponse() {
+    public @Nullable SappResponse getResponse() {
         return response;
     }
 

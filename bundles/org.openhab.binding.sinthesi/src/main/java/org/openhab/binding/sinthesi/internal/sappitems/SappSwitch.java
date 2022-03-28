@@ -10,16 +10,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
 
 import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.SWITCH;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The {@link SappSwitch} class represents a switch item
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappSwitch implements ISappDigitalItem {
+    public String type;
     public int stateAddress;
     public int stateBit;
     public int trgAddr;
@@ -30,7 +35,8 @@ public class SappSwitch implements ISappDigitalItem {
     public boolean value;
     private boolean changed;
 
-    public SappSwitch(int stateAddress, int stateBit, int trgAddr, int trgBit, int onVal, int offVal) {
+    public SappSwitch(String type, int stateAddress, int stateBit, int trgAddr, int trgBit, int onVal, int offVal) {
+        this.type = type;
         this.stateAddress = stateAddress;
         this.stateBit = stateBit;
         this.trgAddr = trgAddr;
@@ -41,7 +47,7 @@ public class SappSwitch implements ISappDigitalItem {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }
@@ -51,6 +57,32 @@ public class SappSwitch implements ISappDigitalItem {
         }
 
         return false;
+    }
+
+    @Override
+    public int getReadAddress() {
+        return stateAddress;
+    }
+
+    @Override
+    public int getReadBit() {
+        return stateBit;
+    }
+
+    @Override
+    public int getWriteAddress() {
+        return trgAddr;
+    }
+
+    @Override
+    public int getWriteBit() {
+        return trgBit;
+    }
+
+    @Override
+    public String getType() {
+        assert type != null;
+        return type;
     }
 
     @Override

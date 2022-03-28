@@ -18,6 +18,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.commands.ISappCommand;
 import org.openhab.binding.sinthesi.internal.sapp.constants.SappOECode;
 import org.openhab.binding.sinthesi.internal.sapp.exceptions.SappException;
@@ -32,10 +34,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappExecutor {
     private int timeout = 5000;
-    private ISappCommand<?> command;
-    private SappConnection connection;
+    private @Nullable ISappCommand<?> command;
+    private @Nullable SappConnection connection;
     private final Logger logger = LoggerFactory.getLogger(SappExecutor.class);
 
     public SappExecutor() {
@@ -51,7 +54,7 @@ public class SappExecutor {
         return timeout;
     }
 
-    public ISappCommand<?> getCommand() {
+    public @Nullable ISappCommand<?> getCommand() {
         return command;
     }
 
@@ -59,11 +62,11 @@ public class SappExecutor {
         this.command = command;
     }
 
-    public void runCommand(String ip, int port) throws IOException, SappException {
+    public void runCommand(String ip, int port) throws IOException {
         connection = new SappConnection(ip, port);
 
         try {
-            connection.SappOEConnect();
+            connection.sappOeConnect();
             if (connection.isConnected()) {
                 execCommand(connection);
             } else {
@@ -75,7 +78,7 @@ public class SappExecutor {
             logger.debug("Cause: {}\nStacktrace: {}", e.getCause(), e.getStackTrace());
             throw new IOException();
         } finally {
-            connection.SappOEDisconnect();
+            connection.sappOeDisconnect();
         }
     }
 
@@ -88,9 +91,11 @@ public class SappExecutor {
         }
     }
 
-    protected void execCommand(SappConnection connection) throws IOException {
+    protected void execCommand(@Nullable SappConnection connection) throws IOException {
         this.connection = connection;
+        assert connection != null;
         SocketChannel channel = connection.getMasSocket();
+        assert command != null;
         byte[] fullCommand = command.getFullCommand();
         ByteBuffer buffer = ByteBuffer.allocate(fullCommand.length);
 
@@ -99,11 +104,13 @@ public class SappExecutor {
         buffer.flip();
 
         try {
-            while (buffer.hasRemaining()) {
-                channel.write(buffer);
-            }
+            if (channel != null) {
+                while (buffer.hasRemaining()) {
+                    channel.write(buffer);
+                }
 
-            readResponse(channel);
+                readResponse(channel);
+            }
         } catch (IOException e) {
             throw new IOException(e.getMessage());
         }
@@ -157,6 +164,7 @@ public class SappExecutor {
                 logger.warn("Communication error: Invalid checksum received");
                 throw new SappException();
             }
+            assert command != null;
             command.setResponse(new SappResponse(commandStatus, sappBuffer.toArray()));
         } catch (IOException | SappException e) {
             logger.error("Communication error: Error while reading the sapp response");

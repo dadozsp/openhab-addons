@@ -13,6 +13,9 @@
 package org.openhab.binding.sinthesi.internal;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,10 +26,16 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.models.CommandQueue;
 import org.openhab.binding.sinthesi.internal.models.SappEntity;
+import org.openhab.binding.sinthesi.internal.models.SappVariable;
 import org.openhab.binding.sinthesi.internal.poller.SappPoller;
 import org.openhab.binding.sinthesi.internal.sapp.Sapp;
 import org.openhab.binding.sinthesi.internal.sapp.commands.SetVirtual;
-import org.openhab.binding.sinthesi.internal.sappItems.*;
+import org.openhab.binding.sinthesi.internal.sappitems.SappContact;
+import org.openhab.binding.sinthesi.internal.sappitems.SappDimmer;
+import org.openhab.binding.sinthesi.internal.sappitems.SappNumber;
+import org.openhab.binding.sinthesi.internal.sappitems.SappRollershutter;
+import org.openhab.binding.sinthesi.internal.sappitems.SappSwitch;
+import org.openhab.core.config.core.Configuration;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
@@ -62,8 +71,8 @@ public class SinthesiHandler extends BaseThingHandler {
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
-        logger.debug("ChannelUID: {}", channelUID);
-        logger.debug("Command: {}", command);
+        logger.info("ChannelUID: {}", channelUID);
+        logger.info("Command: {}", command);
 
         if (entity.getSappDigitalItems().get(channelUID) != null && SinthesiBindingConstants.SWITCH
                 .equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
@@ -83,8 +92,12 @@ public class SinthesiHandler extends BaseThingHandler {
         } else if (entity.getSappAnalogItems().get(channelUID) != null && SinthesiBindingConstants.NUMBER
                 .equals(entity.getSappAnalogItems().get(channelUID).getItemString())) {
             SappNumber number = (SappNumber) entity.getSappAnalogItems().get(channelUID);
-            entity.addToQueue(
-                    new CommandQueue(SetVirtual.class, number.valueAddress, Integer.parseInt(command.toString())));
+            try {
+                entity.addToQueue(new CommandQueue(SetVirtual.class, number.valueAddress,
+                        NumberFormat.getInstance().parse(command.toString())));
+            } catch (ParseException e) {
+                logger.error("Error parsing command {}", command);
+            }
         } else if (entity.getSappAnalogItems().get(channelUID) != null && SinthesiBindingConstants.DIMMER
                 .equals(entity.getSappAnalogItems().get(channelUID).getItemString())) {
             SappDimmer dimmer = (SappDimmer) entity.getSappAnalogItems().get(channelUID);
@@ -93,6 +106,7 @@ public class SinthesiHandler extends BaseThingHandler {
         }
     }
 
+    // TODO - Togliere la configurazione del canale tramite label e usare i parametri nella sezione config
     @Override
     public void initialize() {
         @Nullable
@@ -100,67 +114,73 @@ public class SinthesiHandler extends BaseThingHandler {
 
         updateStatus(ThingStatus.UNKNOWN);
         assert config != null;
-        logger.debug("thing info: uuid; {}, label: {}, Id: {}", this.getThing().getUID(), this.getThing().getLabel(),
+        logger.info("thing info: uuid; {}, label: {}, Id: {}", this.getThing().getUID(), this.getThing().getLabel(),
                 this.getThing().getUID().getId());
 
-        if (Objects.equals(this.getThing().getLabel(), SinthesiBindingConstants.MASTER_TYPE)) {
-            try {
-                entity.setSapp(new Sapp(config.ip, Integer.parseInt(config.port), 5000));
-            } catch (IOException e) {
-                logger.error("Error during comunication");
-                logger.debug("Cause:{}\nException: {}", e.getCause(), e.getStackTrace());
-            }
-            updateStatus(ThingStatus.ONLINE);
-            int pollerTiming = config.pollInterval;
-            pollerClass = new SappPoller(entity, pollerTiming, this);
-            watchdog = watchdogScheduler.scheduleWithFixedDelay(this::pollWatcher, 0, 1, TimeUnit.SECONDS);
-            job = scheduler.schedule(pollerClass::statusPoller, 0, TimeUnit.MILLISECONDS);
-            logger.debug("Connected with PN MAS");
-            logger.debug("Channel number: {}", getThing().getChannels().size());
-            entity.purgeEntity();
-            for (Channel c : getThing().getChannels()) {
-                this.channelLinked(c.getUID());
-            }
-            pollerActive = true;
+        try {
+            entity.setSapp(new Sapp(config.ip, Integer.parseInt(config.port), 5000));
+        } catch (IOException e) {
+            logger.error("Error during communication");
+            logger.debug("Cause:{}\nException: {}", e.getCause(), e.getStackTrace());
         }
+        updateStatus(ThingStatus.ONLINE);
+        int pollerTiming = config.pollInterval;
+        pollerClass = new SappPoller(entity, pollerTiming, this);
+        watchdog = watchdogScheduler.scheduleWithFixedDelay(this::pollWatcher, 0, 1, TimeUnit.SECONDS);
+        job = scheduler.schedule(pollerClass::statusPoller, 0, TimeUnit.MILLISECONDS);
+        logger.info("Connected with PN MAS");
+        logger.info("Channel number: {}", this.getThing().getChannels().size());
+        entity.purgeEntity();
+
+        for (Channel c : this.getThing().getChannels()) {
+            this.channelLinked(c.getUID());
+        }
+        pollerActive = true;
     }
 
     public ChannelConfig getConfigFromChannelStr(ChannelUID uid) {
-        String[] strId = uid.toString().split(":");
-        String[] cfgParam = strId[strId.length - 1].split("-");
-        String[] status = cfgParam[0].split("#");
         ChannelConfig res = new ChannelConfig();
+        Channel current = getThing().getChannel(uid);
+        assert current != null;
+        Configuration channelSettings = current.getConfiguration();
+        SappVariable read;
 
-        res.itemType = cfgParam[cfgParam.length - 1];
-        res.channelKind = status[0];
+        res.channelKind = Objects.requireNonNull(Objects.requireNonNull(current.getAcceptedItemType()));
+        read = new SappVariable(channelSettings.get("read").toString());
+        res.sappItemType = read.getVarType();
 
-        switch (res.itemType) {
+        switch (res.channelKind) {
             case SinthesiBindingConstants.SWITCH:
-                res.statusAddr = Integer.parseInt(status[1].split("B")[0]);
-                res.statusBit = Integer.parseInt(status[1].split("B")[1]);
-                res.trgAddr = Integer.parseInt(cfgParam[1]);
-                res.trgBit = Integer.parseInt(cfgParam[2]);
-                res.onVal = Integer.parseInt(cfgParam[3]);
-                res.offVal = Integer.parseInt(cfgParam[4]);
+                SappVariable write = new SappVariable(channelSettings.get("write").toString());
+
+                res.statusAddr = read.getAddr();
+                res.statusBit = read.getBit();
+                res.trgAddr = write.getAddr();
+                res.trgBit = write.getBit();
+                res.onVal = ((BigDecimal) channelSettings.get("onValue")).intValue();
+                res.offVal = ((BigDecimal) channelSettings.get("offValue")).intValue();
                 break;
             case SinthesiBindingConstants.CONTACT:
-                res.statusAddr = Integer.parseInt(status[1].split("B")[0]);
-                res.statusBit = Integer.parseInt(status[1].split("B")[0]);
+                res.statusAddr = read.getAddr();
+                res.statusBit = read.getBit();
                 break;
             case SinthesiBindingConstants.NUMBER:
             case SinthesiBindingConstants.DIMMER:
-                res.statusAddr = Integer.parseInt(status[1]);
+                res.statusAddr = read.getAddr();
                 break;
             case SinthesiBindingConstants.ROLLER:
-                res.statusAddr = Integer.parseInt(status[1].split("B")[0]);
-                res.statusBit = Integer.parseInt(status[1].split("B")[1]);
-                res.upAddr = Integer.parseInt(cfgParam[1]);
-                res.upBit = Integer.parseInt(cfgParam[2]);
-                res.downAddr = Integer.parseInt(cfgParam[3]);
-                res.downBit = Integer.parseInt(cfgParam[4]);
+                SappVariable up = new SappVariable(channelSettings.get("up").toString());
+                SappVariable down = new SappVariable(channelSettings.get("down").toString());
+
+                res.statusAddr = read.getAddr();
+                res.statusBit = read.getBit();
+                res.upAddr = up.getAddr();
+                res.upBit = up.getBit();
+                res.downAddr = down.getAddr();
+                res.downBit = down.getBit();
                 break;
             default:
-                logger.warn("Item type {} not recognized", res.itemType);
+                logger.warn("Item type {} not recognized", res.channelKind);
         }
 
         return res;
@@ -170,22 +190,23 @@ public class SinthesiHandler extends BaseThingHandler {
     public void channelLinked(ChannelUID channelUID) {
         ChannelConfig cfg = getConfigFromChannelStr(channelUID);
         boolean validKind = true;
-        logger.debug("Channel linked {}", channelUID);
-        logger.debug("Item: {} - {} - {} - {} - {} - {} - {}", cfg.statusAddr, cfg.statusBit, cfg.upAddr, cfg.upBit,
-                cfg.downAddr, cfg.downBit, cfg.itemType);
 
-        switch (cfg.channelKind) {
+        logger.info("Channel linked {}", channelUID);
+        logger.info("Item: {} - {} - {} - {} - {} - {} - {}", cfg.statusAddr, cfg.statusBit, cfg.upAddr, cfg.upBit,
+                cfg.downAddr, cfg.downBit, cfg.sappItemType);
+
+        switch (cfg.sappItemType) {
             case SinthesiBindingConstants.OUT_TYPE:
                 entity.tryAddOutput(cfg.statusAddr);
-                logger.debug("Added output");
+                logger.info("Added output");
                 break;
             case SinthesiBindingConstants.INP_TYPE:
                 entity.tryAddInput(cfg.statusAddr);
-                logger.debug("Added input");
+                logger.info("Added input");
                 break;
             case SinthesiBindingConstants.VIRT_TYPE:
                 entity.tryAddVirtual(cfg.statusAddr);
-                logger.debug("Added virtual");
+                logger.info("Added virtual");
                 break;
             default:
                 validKind = false;
@@ -193,19 +214,18 @@ public class SinthesiHandler extends BaseThingHandler {
         }
 
         if (validKind) {
-            if (cfg.itemType.equalsIgnoreCase(SinthesiBindingConstants.SWITCH)) {
-                entity.addDigitalSappItem(
-                        new SappSwitch(cfg.statusAddr, cfg.statusBit, cfg.trgAddr, cfg.trgBit, cfg.onVal, cfg.offVal),
-                        channelUID);
-            } else if (cfg.itemType.equalsIgnoreCase(SinthesiBindingConstants.CONTACT)) {
-                entity.addDigitalSappItem(new SappContact(cfg.statusAddr, cfg.statusBit), channelUID);
-            } else if (cfg.itemType.equalsIgnoreCase(SinthesiBindingConstants.NUMBER)) {
-                entity.addAnalogSappItem(new SappNumber(cfg.statusAddr), channelUID);
-            } else if (cfg.itemType.equalsIgnoreCase(SinthesiBindingConstants.ROLLER)) {
-                entity.addDigitalSappItem(new SappRollershutter(cfg.statusAddr, cfg.statusBit, cfg.upAddr, cfg.upBit,
-                        cfg.downAddr, cfg.downBit), channelUID);
-            } else if (cfg.itemType.equalsIgnoreCase(SinthesiBindingConstants.DIMMER)) {
-                entity.addAnalogSappItem(new SappDimmer(cfg.statusAddr), channelUID);
+            if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.SWITCH)) {
+                entity.addDigitalSappItem(new SappSwitch(cfg.sappItemType, cfg.statusAddr, cfg.statusBit, cfg.trgAddr,
+                        cfg.trgBit, cfg.onVal, cfg.offVal), channelUID);
+            } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.CONTACT)) {
+                entity.addDigitalSappItem(new SappContact(cfg.sappItemType, cfg.statusAddr, cfg.statusBit), channelUID);
+            } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.NUMBER)) {
+                entity.addAnalogSappItem(new SappNumber(cfg.sappItemType, cfg.statusAddr), channelUID);
+            } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.ROLLER)) {
+                entity.addDigitalSappItem(new SappRollershutter(cfg.sappItemType, cfg.statusAddr, cfg.statusBit,
+                        cfg.upAddr, cfg.upBit, cfg.downAddr, cfg.downBit), channelUID);
+            } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.DIMMER)) {
+                entity.addAnalogSappItem(new SappDimmer(cfg.sappItemType, cfg.statusAddr), channelUID);
             }
         }
     }
@@ -226,14 +246,12 @@ public class SinthesiHandler extends BaseThingHandler {
 
     @Override
     public void handleRemoval() {
-
         disposeJob();
         updateStatus(ThingStatus.REMOVED);
     }
 
     @Override
     public void dispose() {
-
         disposeJob();
     }
 

@@ -12,18 +12,21 @@
  */
 package org.openhab.binding.sinthesi.internal.models;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * The {@link CommandQueue} is responsible for storing received commands before sending them to the PN MAS
  * via sapp protocol
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class CommandQueue {
     public Class<?> command;
     public int address;
-    public int value;
+    public Number value;
 
-    public CommandQueue(Class<?> command, int address, int value) {
+    public CommandQueue(Class<?> command, int address, Number value) {
         this.command = command;
         this.address = address;
         this.value = value;

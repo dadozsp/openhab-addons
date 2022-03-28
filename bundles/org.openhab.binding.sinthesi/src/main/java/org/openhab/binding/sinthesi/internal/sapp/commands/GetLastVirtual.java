@@ -14,6 +14,8 @@ package org.openhab.binding.sinthesi.internal.sapp.commands;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappByteBuffer;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
@@ -24,16 +26,18 @@ import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class GetLastVirtual implements ISappCommand<Map<Integer, Integer>> {
 
     private final byte[] command;
-    private SappResponse response;
+    private @Nullable SappResponse response;
 
     public GetLastVirtual() {
         SappByteBuffer buffer = new SappByteBuffer();
         buffer.clear();
         buffer.add((byte) 0x82);
         command = buffer.toArray();
+        response = null;
     }
 
     public boolean noNewData() {
@@ -46,17 +50,17 @@ public class GetLastVirtual implements ISappCommand<Map<Integer, Integer>> {
     }
 
     @Override
-    public void setResponse(SappResponse response) {
+    public void setResponse(@Nullable SappResponse response) {
         this.response = response;
     }
 
     @Override
-    public SappResponse getResponse() {
+    public @Nullable SappResponse getResponse() {
         return response;
     }
 
     @Override
-    public Map<Integer, Integer> getResponseData() {
+    public Map<Integer, @Nullable Integer> getResponseData() {
         return response.getDataAsWordWordMap();
     }
 }

@@ -10,16 +10,24 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The {@link ISappAnalogItem} interface rapresents a generic analog items which can store a numerical value
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public interface ISappAnalogItem {
 
-    void updateAnalogValue(Integer value);
+    int getAddress();
+
+    String getType();
+
+    void updateAnalogValue(@Nullable Integer value);
 
     String getAnalogValue();
 

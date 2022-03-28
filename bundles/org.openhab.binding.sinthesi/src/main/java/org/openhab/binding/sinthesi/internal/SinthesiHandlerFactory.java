@@ -48,7 +48,6 @@ public class SinthesiHandlerFactory extends BaseThingHandlerFactory {
         if (SinthesiBindingConstants.MASTER.equals(thingTypeUID) || SinthesiBindingConstants.OUTPUT.equals(thingTypeUID)
                 || SinthesiBindingConstants.INPUT.equals(thingTypeUID)
                 || SinthesiBindingConstants.VIRTUAL.equals(thingTypeUID)) {
-
             return new SinthesiHandler(thing);
         }
 

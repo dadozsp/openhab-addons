@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.sinthesi.internal.sapp.commands;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappByteBuffer;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
@@ -22,10 +24,11 @@ import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class GetInput implements ISappCommand<Integer> {
     private final byte[] command;
     private final byte mod;
-    private SappResponse response;
+    private @Nullable SappResponse response;
 
     public GetInput(byte mod) {
         this.mod = mod;
@@ -34,6 +37,7 @@ public class GetInput implements ISappCommand<Integer> {
         buffer.add((byte) 0x74);
         buffer.addRange(SappUtils.getHexAsciiByte((byte) mod));
         this.command = buffer.toArray();
+        response = null;
     }
 
     public byte getMod() {
@@ -46,17 +50,19 @@ public class GetInput implements ISappCommand<Integer> {
     }
 
     @Override
-    public void setResponse(SappResponse response) {
+    public void setResponse(@Nullable SappResponse response) {
         this.response = response;
     }
 
     @Override
-    public SappResponse getResponse() {
+    public @Nullable SappResponse getResponse() {
         return response;
     }
 
     @Override
+    @SuppressWarnings("null")
     public Integer getResponseData() {
+        assert response != null;
         return response.getDataAsWord();
     }
 }

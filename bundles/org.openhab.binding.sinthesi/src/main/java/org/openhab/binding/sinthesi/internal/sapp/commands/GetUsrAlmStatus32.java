@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.sinthesi.internal.sapp.commands;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappByteBuffer;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
@@ -22,12 +24,13 @@ import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class GetUsrAlmStatus32 implements ISappCommand<byte[]> {
 
     private final byte[] command;
     private final byte startAlm;
     private final byte almNum;
-    private SappResponse response;
+    private @Nullable SappResponse response;
 
     public GetUsrAlmStatus32(byte startAlm, byte almNum) {
         this.startAlm = startAlm;
@@ -38,6 +41,7 @@ public class GetUsrAlmStatus32 implements ISappCommand<byte[]> {
         buffer.addRange(SappUtils.getHexAsciiByte(startAlm));
         buffer.addRange(SappUtils.getHexAsciiByte(almNum));
         command = buffer.toArray();
+        response = null;
     }
 
     public byte getStartAlm() {
@@ -54,17 +58,18 @@ public class GetUsrAlmStatus32 implements ISappCommand<byte[]> {
     }
 
     @Override
-    public void setResponse(SappResponse response) {
+    public void setResponse(@Nullable SappResponse response) {
         this.response = response;
     }
 
     @Override
-    public SappResponse getResponse() {
+    public @Nullable SappResponse getResponse() {
         return response;
     }
 
     @Override
     public byte[] getResponseData() {
+        assert response != null;
         return response.getDataAsByteArray();
     }
 }

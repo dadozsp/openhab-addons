@@ -12,13 +12,17 @@
  */
 package org.openhab.binding.sinthesi.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * The {@link ChannelConfig} class holds the parameter needed to setup a new channel
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class ChannelConfig {
     public String channelKind;
+    public String sappItemType;
     public int statusAddr;
     public int statusBit;
     public int trgAddr;
@@ -29,5 +33,9 @@ public class ChannelConfig {
     public int downBit;
     public int onVal;
     public int offVal;
-    public String itemType;
+
+    public ChannelConfig() {
+        channelKind = "";
+        sappItemType = "";
+    }
 }

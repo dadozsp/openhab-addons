@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.enums.SappCode;
 
 /**
@@ -39,9 +40,9 @@ public class SappResponseCode {
     public static final byte COMMAND_NOT_PROCESSED = (byte) 0x8D;
     public static final byte COMMAND_NOT_ALLOWED_IN_RUN = (byte) 0x8E;
 
-    public static Map<Byte, SappCode> errorMap = new HashMap<>();
+    public static Map<Byte, @Nullable SappCode> errorMap = new HashMap<>();
 
-    public static Map<Byte, SappCode> getErrorMap() {
+    public static Map<Byte, @Nullable SappCode> getErrorMap() {
         if (errorMap.isEmpty()) {
             errorMap.put(COMMAND_PROCESSED, SappCode.COMMAND_PROCESSED);
             errorMap.put(ADDRESS_OVER_RANGE, SappCode.ADDRESS_OVER_RANGE);

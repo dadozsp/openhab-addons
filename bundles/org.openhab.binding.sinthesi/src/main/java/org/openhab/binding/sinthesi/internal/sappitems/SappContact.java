@@ -10,8 +10,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.SinthesiBindingConstants;
 
 /**
@@ -19,17 +21,44 @@ import org.openhab.binding.sinthesi.internal.SinthesiBindingConstants;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappContact implements ISappDigitalItem {
-
+    public String type;
     public int stateAddress;
     public int stateBit;
     public boolean value;
     public boolean changed;
 
-    public SappContact(int stateAddress, int stateBit) {
+    public SappContact(String type, int stateAddress, int stateBit) {
+        this.type = type;
         this.stateAddress = stateAddress;
         this.stateBit = stateBit;
         changed = false;
+    }
+
+    @Override
+    public int getReadAddress() {
+        return stateAddress;
+    }
+
+    @Override
+    public int getReadBit() {
+        return stateBit;
+    }
+
+    @Override
+    public int getWriteAddress() {
+        return 0;
+    }
+
+    @Override
+    public int getWriteBit() {
+        return 0;
+    }
+
+    @Override
+    public String getType() {
+        return type;
     }
 
     @Override
@@ -60,7 +89,7 @@ public class SappContact implements ISappDigitalItem {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }

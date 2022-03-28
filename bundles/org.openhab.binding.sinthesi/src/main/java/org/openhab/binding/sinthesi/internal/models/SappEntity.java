@@ -15,12 +15,17 @@ package org.openhab.binding.sinthesi.internal.models;
 import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.Sapp;
 import org.openhab.binding.sinthesi.internal.sapp.exceptions.SappException;
-import org.openhab.binding.sinthesi.internal.sappItems.ISappAnalogItem;
-import org.openhab.binding.sinthesi.internal.sappItems.ISappDigitalItem;
+import org.openhab.binding.sinthesi.internal.sappitems.ISappAnalogItem;
+import org.openhab.binding.sinthesi.internal.sappitems.ISappDigitalItem;
 import org.openhab.core.thing.ChannelUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +37,15 @@ import org.slf4j.LoggerFactory;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappEntity {
     private Sapp sapp;
-    private final Map<Integer, Integer> usedInput;
-    private final Map<Integer, Integer> usedOutput;
-    private final Map<Integer, Integer> usedVirtual;
-    private Map<Integer, Integer> lastInput;
-    private Map<Integer, Integer> lastOutput;
-    private Map<Integer, Integer> lastVirtual;
+    private final Map<Integer, @Nullable Integer> usedInput;
+    private final Map<Integer, @Nullable Integer> usedOutput;
+    private final Map<Integer, @Nullable Integer> usedVirtual;
+    private Map<Integer, @Nullable Integer> lastInput;
+    private Map<Integer, @Nullable Integer> lastOutput;
+    private Map<Integer, @Nullable Integer> lastVirtual;
     private final Map<ChannelUID, ISappDigitalItem> sappDigitalItems;
     private final Map<ChannelUID, ISappAnalogItem> sappAnalogItems;
     private final List<CommandQueue> commandQueues;
@@ -49,7 +55,7 @@ public class SappEntity {
     private final Logger logger = LoggerFactory.getLogger(SappEntity.class);
 
     public SappEntity() {
-        sapp = null;
+        sapp = new Sapp();
         usedInput = new HashMap<>();
         usedOutput = new HashMap<>();
         usedVirtual = new HashMap<>();
@@ -58,7 +64,7 @@ public class SappEntity {
         lastVirtual = new HashMap<>();
         sappDigitalItems = new HashMap<>();
         sappAnalogItems = new HashMap<>();
-        commandQueues = new ArrayList<>();
+        commandQueues = new CopyOnWriteArrayList<>();
         firstOutRun = true;
         firstInRun = true;
         firstVirtRun = true;
@@ -89,16 +95,40 @@ public class SappEntity {
         return sappAnalogItems;
     }
 
-    public Integer tryGetInput(int addr) {
-        return usedInput.get(addr);
+    public int tryGetInput(int addr) {
+        if (usedInput.containsKey(addr)) {
+            Integer value = usedInput.get(addr);
+
+            if (value != null) {
+                return value;
+            }
+        }
+
+        return -1;
     }
 
-    public Integer tryGetOutput(int addr) {
-        return usedOutput.get(addr);
+    public int tryGetOutput(int addr) {
+        if (usedOutput.containsKey(addr)) {
+            Integer value = usedOutput.get(addr);
+
+            if (value != null) {
+                return value;
+            }
+        }
+
+        return -1;
     }
 
-    public Integer tryGetVirtual(int addr) {
-        return usedVirtual.get(addr);
+    public int tryGetVirtual(int addr) {
+        if (usedVirtual.containsKey(addr)) {
+            Integer value = usedVirtual.get(addr);
+
+            if (value != null) {
+                return value;
+            }
+        }
+
+        return -1;
     }
 
     public List<CommandQueue> getCommandQueues() {
@@ -152,7 +182,9 @@ public class SappEntity {
             for (Integer k : usedOutput.keySet()) {
                 if (!firstOutRun) {
                     if (lastOutput.containsKey(k)) {
-                        if (!usedOutput.get(k).equals(lastOutput.get(k))) {
+                        Integer out = usedOutput.get(k);
+                        assert out != null;
+                        if (lastOutput.containsKey(k) && !out.equals(lastOutput.get(k))) {
                             usedOutput.put(k, lastOutput.get(k));
                         }
                     }
@@ -176,7 +208,9 @@ public class SappEntity {
             for (Integer k : usedInput.keySet()) {
                 if (!firstInRun) {
                     if (lastInput.containsKey(k)) {
-                        if (!usedInput.get(k).equals(lastInput.get(k))) {
+                        Integer inp = usedInput.get(k);
+                        assert inp != null;
+                        if (!inp.equals(lastInput.get(k))) {
                             usedInput.put(k, lastInput.get(k));
                         }
                     }
@@ -201,7 +235,9 @@ public class SappEntity {
             for (Integer k : usedVirtual.keySet()) {
                 if (!firstVirtRun) {
                     if (lastVirtual.containsKey(k)) {
-                        if (!usedVirtual.get(k).equals(lastVirtual.get(k))) {
+                        Integer virt = usedVirtual.get(k);
+                        assert virt != null;
+                        if (!virt.equals(lastVirtual.get(k))) {
                             usedVirtual.put(k, lastVirtual.get(k));
                         }
                     }
@@ -222,59 +258,54 @@ public class SappEntity {
     }
 
     public void updateItemsValue() {
-        String[] channelKind;
         int addr;
-        int bit = 0;
-        for (ChannelUID id : sappDigitalItems.keySet()) {
-            channelKind = id.toString().split(":")[3].split("#");
-            if (channelKind[1].contains("B")) {
-                addr = Integer.parseInt(channelKind[1].split("B")[0]);
-                bit = Integer.parseInt(channelKind[1].split("B")[1].split("-")[0]);
-            } else {
-                addr = Integer.parseInt(channelKind[0]);
+        int bit;
+
+        for (ISappDigitalItem item : sappDigitalItems.values()) {
+            addr = item.getReadAddress();
+            bit = item.getReadBit();
+
+            if (bit == 0) {
+                logger.warn("Item {} ignored, invalid bit ", item.getItemString());
+                continue;
             }
-            switch (channelKind[0]) {
+
+            switch (item.getType()) {
                 case OUT_TYPE:
-                    if (sappDigitalItems.get(id) != null) {
-                        sappDigitalItems.get(id).updateDigitalValue(usedOutput.get(addr), bit);
-                    }
+                    Integer out = usedOutput.get(addr);
+                    assert out != null;
+                    item.updateDigitalValue(out, bit);
                     break;
                 case INP_TYPE:
-                    if (sappDigitalItems.get(id) != null) {
-                        sappDigitalItems.get(id).updateDigitalValue(usedInput.get(addr), bit);
-                    }
+                    Integer ing = usedInput.get(addr);
+                    assert ing != null;
+                    item.updateDigitalValue(ing, bit);
                     break;
                 case VIRT_TYPE:
-                    if (sappDigitalItems.get(id) != null) {
-                        sappDigitalItems.get(id).updateDigitalValue(usedVirtual.get(addr), bit);
-                    }
+                    Integer vir = usedVirtual.get(addr);
+                    assert vir != null;
+                    item.updateDigitalValue(vir, bit);
                     break;
                 default:
-                    logger.warn("Unknown channel type received: {}", Arrays.toString(channelKind));
+                    logger.warn("Unknown channel type received: {}", item.getType());
             }
         }
 
-        for (ChannelUID id : sappAnalogItems.keySet()) {
-            channelKind = id.toString().split(":")[3].split("#");
-            addr = Integer.parseInt(channelKind[1].split("-")[0]);
-            switch (channelKind[0]) {
+        for (ISappAnalogItem item : sappAnalogItems.values()) {
+
+            addr = item.getAddress();
+            switch (item.getType()) {
                 case OUT_TYPE:
-                    if (sappAnalogItems.get(id) != null) {
-                        sappAnalogItems.get(id).updateAnalogValue(usedOutput.get(addr));
-                    }
+                    item.updateAnalogValue(usedOutput.get(addr));
                     break;
                 case INP_TYPE:
-                    if (sappAnalogItems.get(id) != null) {
-                        sappAnalogItems.get(id).updateAnalogValue(usedInput.get(addr));
-                    }
+                    item.updateAnalogValue(usedInput.get(addr));
                     break;
                 case VIRT_TYPE:
-                    if (sappAnalogItems.get(id) != null) {
-                        sappAnalogItems.get(id).updateAnalogValue(usedVirtual.get(addr));
-                    }
+                    item.updateAnalogValue(usedVirtual.get(addr));
                     break;
                 default:
-                    logger.warn("Unknown channel type received: {}", Arrays.toString(channelKind));
+                    logger.warn("Unknown channel type received: {}", item.getType());
             }
         }
     }
@@ -290,7 +321,7 @@ public class SappEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }

@@ -12,13 +12,21 @@
  */
 package org.openhab.binding.sinthesi.internal;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * The {@link SinthesiConfiguration} class contains fields mapping thing configuration parameters.
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SinthesiConfiguration {
     public String ip;
     public String port;
     public int pollInterval = 100;
+
+    public SinthesiConfiguration() {
+        ip = "";
+        port = "";
+    }
 }

@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +26,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappConnection implements AutoCloseable {
     private String masAddress;
     private int masPort;
-    private SocketChannel masSocket;
+    private @Nullable SocketChannel masSocket;
     private int attempt = 0;
-    private final static int ATTEMPT_LIMIT = 500;
-    private final static int RETRY_LIMIT = 3;
+    private static final int ATTEMPT_LIMIT = 500;
+    private static final int RETRY_LIMIT = 3;
     private boolean unableToConnect = false;
     private final Logger logger = LoggerFactory.getLogger(SappConnection.class);
 
@@ -46,10 +49,10 @@ public class SappConnection implements AutoCloseable {
         this.masSocket = null;
     }
 
-    public void SappOEConnect() throws IOException {
+    public void sappOeConnect() throws IOException {
         try {
             if (masSocket != null) {
-                SappOEDisconnect();
+                sappOeDisconnect();
             }
 
             masSocket = SocketChannel.open();
@@ -72,7 +75,7 @@ public class SappConnection implements AutoCloseable {
             }
 
             if (unableToConnect) {
-                SappOEDisconnect();
+                sappOeDisconnect();
                 logger.error("Unable to connect with host {}:{}", this.masAddress, this.masPort);
             }
 
@@ -83,13 +86,13 @@ public class SappConnection implements AutoCloseable {
         }
     }
 
-    public void SappOEDisconnect() {
+    public void sappOeDisconnect() {
         if (masSocket != null) {
             try {
                 masSocket.close();
             } catch (IOException e) {
                 logger.error("Unable to connect with host {}:{}", this.masAddress, this.masPort);
-                logger.debug("Cause: {}\nException: {}", e.getCause(), e.getStackTrace());
+                logger.trace("Cause: {}\nException: {}", e.getCause(), e.getStackTrace());
             } finally {
                 masSocket = null;
             }
@@ -112,7 +115,7 @@ public class SappConnection implements AutoCloseable {
         return masPort;
     }
 
-    public SocketChannel getMasSocket() {
+    public @Nullable SocketChannel getMasSocket() {
         return masSocket;
     }
 
@@ -125,7 +128,7 @@ public class SappConnection implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
-        this.SappOEDisconnect();
+    public void close() {
+        this.sappOeDisconnect();
     }
 }

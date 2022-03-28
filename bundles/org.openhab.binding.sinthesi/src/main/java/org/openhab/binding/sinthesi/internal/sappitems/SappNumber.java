@@ -10,28 +10,45 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
 
 import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.NUMBER;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The {@link SappNumber} class rapresents a generic numerical item.
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappNumber implements ISappAnalogItem {
+    public String type;
     public int valueAddress;
     public String value;
     private boolean changed;
 
-    public SappNumber(int valueAddress) {
+    public SappNumber(String type, int valueAddress) {
+        this.type = type;
         this.valueAddress = valueAddress;
+        value = "";
     }
 
     @Override
-    public void updateAnalogValue(Integer value) {
-        if (!value.toString().equals(this.value)) {
-            this.value = value.toString();
+    public int getAddress() {
+        return valueAddress;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public void updateAnalogValue(@Nullable Integer newValue) {
+        if (!newValue.toString().equals(this.value)) {
+            this.value = newValue.toString();
             changed = true;
         } else {
             changed = false;
@@ -54,7 +71,7 @@ public class SappNumber implements ISappAnalogItem {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }

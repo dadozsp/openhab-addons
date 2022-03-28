@@ -12,6 +12,8 @@
  */
 package org.openhab.binding.sinthesi.internal.sapp.commands;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.SappResponse;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappByteBuffer;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
@@ -22,10 +24,11 @@ import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class GetOutput implements ISappCommand<Integer> {
     private final byte[] command;
     private final byte mod;
-    private SappResponse response;
+    private @Nullable SappResponse response;
 
     public GetOutput(byte mod) {
         this.mod = mod;
@@ -34,6 +37,7 @@ public class GetOutput implements ISappCommand<Integer> {
         buffer.add((byte) 0x75);
         buffer.addRange(SappUtils.getHexAsciiByte(mod));
         this.command = buffer.toArray();
+        response = null;
     }
 
     public int getMod() {
@@ -46,12 +50,12 @@ public class GetOutput implements ISappCommand<Integer> {
     }
 
     @Override
-    public void setResponse(SappResponse response) {
+    public void setResponse(@Nullable SappResponse response) {
         this.response = response;
     }
 
     @Override
-    public SappResponse getResponse() {
+    public @Nullable SappResponse getResponse() {
         return response;
     }
 

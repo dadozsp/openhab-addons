@@ -10,16 +10,21 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
 
 import static org.openhab.binding.sinthesi.internal.SinthesiBindingConstants.ROLLER;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * The {@link SappRollershutter} class represents a roller shutter item
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappRollershutter implements ISappDigitalItem {
+    public String type;
     public int stateAddress;
     public int stateBit;
     public int upAddr;
@@ -29,13 +34,40 @@ public class SappRollershutter implements ISappDigitalItem {
     public boolean value;
     private boolean changed;
 
-    public SappRollershutter(int stateAddress, int stateBit, int upAddr, int upBit, int downAddr, int downBit) {
+    public SappRollershutter(String type, int stateAddress, int stateBit, int upAddr, int upBit, int downAddr,
+            int downBit) {
+        this.type = type;
         this.stateAddress = stateAddress;
         this.stateBit = stateBit;
         this.upAddr = upAddr;
         this.upBit = upBit;
         this.downAddr = downAddr;
         this.downBit = downBit;
+    }
+
+    @Override
+    public int getReadAddress() {
+        return stateAddress;
+    }
+
+    @Override
+    public int getReadBit() {
+        return stateBit;
+    }
+
+    @Override
+    public int getWriteAddress() {
+        return 0;
+    }
+
+    @Override
+    public int getWriteBit() {
+        return 0;
+    }
+
+    @Override
+    public String getType() {
+        return type;
     }
 
     @Override
@@ -66,7 +98,7 @@ public class SappRollershutter implements ISappDigitalItem {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }

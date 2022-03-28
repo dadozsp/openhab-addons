@@ -10,14 +10,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.openhab.binding.sinthesi.internal.sappItems;
+package org.openhab.binding.sinthesi.internal.sappitems;
+
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * The {@link ISappDigitalItem} interface rapresents a generic digital item which can hold only boolean statuses
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public interface ISappDigitalItem {
+
+    int getReadAddress();
+
+    int getReadBit();
+
+    int getWriteAddress();
+
+    int getWriteBit();
+
+    String getType();
 
     void updateDigitalValue(int value, int bit);
 

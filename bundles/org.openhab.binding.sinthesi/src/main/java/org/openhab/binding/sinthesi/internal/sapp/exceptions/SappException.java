@@ -22,6 +22,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 @NonNullByDefault
 public class SappException extends Exception {
 
+    private static final long serialVersionUID = 42L;
+
     public SappException() {
         super();
     }

@@ -12,16 +12,21 @@
  */
 package org.openhab.binding.sinthesi.internal.poller;
 
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.binding.sinthesi.internal.SinthesiHandler;
 import org.openhab.binding.sinthesi.internal.models.CommandQueue;
 import org.openhab.binding.sinthesi.internal.models.SappEntity;
 import org.openhab.binding.sinthesi.internal.sapp.commands.SetVirtual;
-import org.openhab.binding.sinthesi.internal.sapp.exceptions.SappException;
-import org.openhab.binding.sinthesi.internal.sappItems.*;
+import org.openhab.binding.sinthesi.internal.sappitems.ISappAnalogItem;
+import org.openhab.binding.sinthesi.internal.sappitems.ISappDigitalItem;
+import org.openhab.binding.sinthesi.internal.sappitems.SappContact;
+import org.openhab.binding.sinthesi.internal.sappitems.SappDimmer;
+import org.openhab.binding.sinthesi.internal.sappitems.SappNumber;
+import org.openhab.binding.sinthesi.internal.sappitems.SappRollershutter;
+import org.openhab.binding.sinthesi.internal.sappitems.SappSwitch;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.OpenClosedType;
@@ -37,6 +42,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappPoller {
 
     private final SappEntity entity;
@@ -78,8 +84,8 @@ public class SappPoller {
 
                     updateDigitalItems();
                     updateAnalogItems();
-
                     runQueuedCommands();
+
                     Thread.sleep(pollerTiming);
                 } catch (Exception e) {
                     logger.error("Error while polling for updates");
@@ -97,7 +103,6 @@ public class SappPoller {
         for (ChannelUID id : digitalItems.keySet()) {
             if (digitalItems.get(id) instanceof SappSwitch) {
                 if (digitalItems.get(id).hasChanged() && pollerActive) {
-
                     handler.updateItemState(id,
                             (digitalItems.get(id).getDigitalValue()) ? OnOffType.ON : OnOffType.OFF);
                 }
@@ -137,13 +142,13 @@ public class SappPoller {
 
     private void runQueuedCommands() {
         synchronized (this) {
-            for (Iterator<CommandQueue> c = entity.getCommandQueues().iterator(); c.hasNext();) {
-                CommandQueue elem = c.next();
+            List<CommandQueue> queue = entity.getCommandQueues();
+            for (CommandQueue elem : entity.getCommandQueues()) {
                 if (elem.command == SetVirtual.class) {
                     try {
-                        entity.getSapp().sappSetVirtual(elem.address, elem.value);
-                        c.remove();
-                    } catch (IOException | SappException e) {
+                        entity.getSapp().sappSetVirtual(elem.address, elem.value.intValue());
+                        queue.remove(elem);
+                    } catch (Exception e) {
                         logger.error("Error while running queued command");
                     }
                 }

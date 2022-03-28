@@ -14,6 +14,7 @@ package org.openhab.binding.sinthesi.internal;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.openhab.core.thing.ThingTypeUID;
+import org.openhab.core.thing.type.ChannelTypeUID;
 
 /**
  * The {@link SinthesiBindingConstants} class defines common constants, which are
@@ -24,7 +25,7 @@ import org.openhab.core.thing.ThingTypeUID;
 @NonNullByDefault
 public class SinthesiBindingConstants {
 
-    private static final String BINDING_ID = "Sinthesi";
+    private static final String BINDING_ID = "sinthesi";
 
     public static final String MASTER_TYPE = "pnmas";
     /* Module Output */
@@ -40,12 +41,16 @@ public class SinthesiBindingConstants {
     public static final ThingTypeUID INPUT = new ThingTypeUID(BINDING_ID, "inp");
     public static final ThingTypeUID VIRTUAL = new ThingTypeUID(BINDING_ID, "virt");
 
+    // List of all Channels Type UIDs
+    public static final ChannelTypeUID ANALOG_ITEM = new ChannelTypeUID(BINDING_ID, "analogItem");
+    public static final ChannelTypeUID DIGITAL_ITEM = new ChannelTypeUID(BINDING_ID, "digitalItem");
+
     // List of supported items
-    public static final String SWITCH = "SW";
-    public static final String CONTACT = "CT";
-    public static final String NUMBER = "NB";
-    public static final String ROLLER = "RS";
-    public static final String DIMMER = "DM";
+    public static final String SWITCH = "Switch";
+    public static final String CONTACT = "Contact";
+    public static final String NUMBER = "Number";
+    public static final String ROLLER = "Rollershutter";
+    public static final String DIMMER = "Dimmer";
 
     public static final double DIMM_DIVIDER = 2.55;
 }

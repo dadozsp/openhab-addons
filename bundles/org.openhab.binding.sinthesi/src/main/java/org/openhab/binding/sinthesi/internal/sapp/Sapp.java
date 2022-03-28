@@ -15,7 +15,18 @@ package org.openhab.binding.sinthesi.internal.sapp;
 import java.io.IOException;
 import java.util.Map;
 
-import org.openhab.binding.sinthesi.internal.sapp.commands.*;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetInput;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetLastInput;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetLastOutput;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetLastVirtual;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetOutput;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetUsrAlmStatus;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetUsrAlmStatus32;
+import org.openhab.binding.sinthesi.internal.sapp.commands.GetVirtual;
+import org.openhab.binding.sinthesi.internal.sapp.commands.ISappCommand;
+import org.openhab.binding.sinthesi.internal.sapp.commands.SetVirtual;
 import org.openhab.binding.sinthesi.internal.sapp.enums.SappCode;
 import org.openhab.binding.sinthesi.internal.sapp.exceptions.SappException;
 import org.slf4j.Logger;
@@ -27,6 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class Sapp implements AutoCloseable {
     private final SappConnection connection;
     private final SappExecutor executor;
@@ -35,15 +47,15 @@ public class Sapp implements AutoCloseable {
     private final Logger logger = LoggerFactory.getLogger(Sapp.class);
 
     public Sapp() {
-        connection = null;
-        executor = null;
+        connection = new SappConnection();
+        executor = new SappExecutor();
         initialized = false;
     }
 
     public Sapp(String ip, int port, int timeout) throws IOException {
         connection = new SappConnection(ip, port);
         executor = new SappExecutor(timeout);
-        connection.SappOEConnect();
+        connection.sappOeConnect();
         initialized = true;
     }
 
@@ -104,7 +116,7 @@ public class Sapp implements AutoCloseable {
         tryRun(command);
     }
 
-    public Map<Integer, Integer> sappGetLastVirtual() throws IOException, SappException {
+    public Map<Integer, @Nullable Integer> sappGetLastVirtual() throws IOException, SappException {
         GetLastVirtual command = new GetLastVirtual();
         int retryCount = 0;
 
@@ -116,7 +128,7 @@ public class Sapp implements AutoCloseable {
         return command.getResponseData();
     }
 
-    public Map<Integer, Integer> sappGetLastOutput() throws IOException, SappException {
+    public Map<Integer, @Nullable Integer> sappGetLastOutput() throws IOException, SappException {
         GetLastOutput command = new GetLastOutput();
         int retryCount = 0;
 
@@ -128,7 +140,7 @@ public class Sapp implements AutoCloseable {
         return command.getResponseData();
     }
 
-    public Map<Integer, Integer> sappGetLastInput() throws IOException, SappException {
+    public Map<Integer, @Nullable Integer> sappGetLastInput() throws IOException, SappException {
         GetLastInput command = new GetLastInput();
         int retryCount = 0;
 
@@ -177,8 +189,8 @@ public class Sapp implements AutoCloseable {
 
     public void refreshAndRetry() throws IOException {
         logger.debug("Connection refreshed");
-        this.connection.SappOEDisconnect();
-        this.connection.SappOEConnect();
+        this.connection.sappOeDisconnect();
+        this.connection.sappOeConnect();
     }
 
     @Override

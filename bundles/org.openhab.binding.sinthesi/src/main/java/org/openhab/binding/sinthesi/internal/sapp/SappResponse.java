@@ -15,6 +15,8 @@ package org.openhab.binding.sinthesi.internal.sapp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.openhab.binding.sinthesi.internal.sapp.constants.SappResponseCode;
 import org.openhab.binding.sinthesi.internal.sapp.enums.SappCode;
 import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
@@ -24,9 +26,15 @@ import org.openhab.binding.sinthesi.internal.sapp.utils.SappUtils;
  *
  * @author Davide Stefani - Initial contribution
  */
+@NonNullByDefault
 public class SappResponse {
     private final byte status;
     private final byte[] data;
+
+    public SappResponse() {
+        status = 0x00;
+        data = new byte[0];
+    }
 
     public SappResponse(byte status, byte[] data) {
         this.status = status;
@@ -41,7 +49,7 @@ public class SappResponse {
         return data;
     }
 
-    public SappCode getCommandResult() {
+    public @Nullable SappCode getCommandResult() {
         if (this.status == 0x01) {
             return SappResponseCode.getErrorMap().get((byte) this.getDataAsWord());
         } else {
@@ -81,7 +89,7 @@ public class SappResponse {
 
     public byte[] getDataAsByteArray() {
         if (data.length < 2) {
-            return null;
+            return new byte[0];
         }
 
         byte[] resultArr = new byte[data.length / 2];
@@ -104,7 +112,7 @@ public class SappResponse {
 
     public int[] getDataAsWordArray() {
         if (data.length < 4) {
-            return null;
+            return new int[0];
         }
 
         int[] resultArr = new int[data.length / 4];
@@ -125,8 +133,8 @@ public class SappResponse {
         return resultArr;
     }
 
-    public Map<Integer, Integer> getDataAsByteWordMap() {
-        Map<Integer, Integer> resultMap = new HashMap<>();
+    public Map<Integer, @Nullable Integer> getDataAsByteWordMap() {
+        Map<Integer, @Nullable Integer> resultMap = new HashMap<>();
 
         for (int i = 0; i < data.length; i += 6) {
             int key = 0;
@@ -155,8 +163,8 @@ public class SappResponse {
         return resultMap;
     }
 
-    public Map<Integer, Integer> getDataAsWordWordMap() {
-        Map<Integer, Integer> resultMap = new HashMap<>();
+    public Map<Integer, @Nullable Integer> getDataAsWordWordMap() {
+        Map<Integer, @Nullable Integer> resultMap = new HashMap<>();
 
         for (int i = 0; i < data.length; i += 8) {
             int key = 0;
