@@ -111,9 +111,15 @@ public class Sapp implements AutoCloseable {
             logger.warn("Invalid virtual variable address: {}", addr);
             throw new SappException();
         }
+        int retryCount = 0;
         SetVirtual command = new SetVirtual(addr, value);
 
-        tryRun(command);
+        do {
+            tryRun(command);
+            retryCount++;
+        } while (command.getResponse() == null
+                || (command.getResponse() != null && command.getResponse().getStatus() != 0x00)
+                        && retryCount <= RETRY_NUM);
     }
 
     public Map<Integer, @Nullable Integer> sappGetLastVirtual() throws IOException, SappException {

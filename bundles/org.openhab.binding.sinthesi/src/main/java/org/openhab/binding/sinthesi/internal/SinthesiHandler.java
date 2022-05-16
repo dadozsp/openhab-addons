@@ -30,12 +30,9 @@ import org.openhab.binding.sinthesi.internal.models.SappVariable;
 import org.openhab.binding.sinthesi.internal.poller.SappPoller;
 import org.openhab.binding.sinthesi.internal.sapp.Sapp;
 import org.openhab.binding.sinthesi.internal.sapp.commands.SetVirtual;
-import org.openhab.binding.sinthesi.internal.sappitems.SappContact;
-import org.openhab.binding.sinthesi.internal.sappitems.SappDimmer;
-import org.openhab.binding.sinthesi.internal.sappitems.SappNumber;
-import org.openhab.binding.sinthesi.internal.sappitems.SappRollershutter;
-import org.openhab.binding.sinthesi.internal.sappitems.SappSwitch;
+import org.openhab.binding.sinthesi.internal.sappitems.*;
 import org.openhab.core.config.core.Configuration;
+import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
@@ -78,6 +75,7 @@ public class SinthesiHandler extends BaseThingHandler {
                 .equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
             SappSwitch item = (SappSwitch) entity.getSappDigitalItems().get(channelUID);
             entity.addToQueue(new CommandQueue(SetVirtual.class, item.trgAddr, (int) Math.pow(2, item.trgBit - 1)));
+
         } else if (entity.getSappDigitalItems().get(channelUID) != null && SinthesiBindingConstants.ROLLER
                 .equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
             SappRollershutter roller = (SappRollershutter) entity.getSappDigitalItems().get(channelUID);
@@ -92,9 +90,10 @@ public class SinthesiHandler extends BaseThingHandler {
         } else if (entity.getSappAnalogItems().get(channelUID) != null && SinthesiBindingConstants.NUMBER
                 .equals(entity.getSappAnalogItems().get(channelUID).getItemString())) {
             SappNumber number = (SappNumber) entity.getSappAnalogItems().get(channelUID);
+            float comm = ((DecimalType) command).floatValue();
             try {
                 entity.addToQueue(new CommandQueue(SetVirtual.class, number.valueAddress,
-                        NumberFormat.getInstance().parse(command.toString())));
+                        NumberFormat.getInstance().parse(Float.toString(comm))));
             } catch (ParseException e) {
                 logger.error("Error parsing command {}", command);
             }
@@ -106,7 +105,6 @@ public class SinthesiHandler extends BaseThingHandler {
         }
     }
 
-    // TODO - Togliere la configurazione del canale tramite label e usare i parametri nella sezione config
     @Override
     public void initialize() {
         @Nullable
@@ -123,6 +121,7 @@ public class SinthesiHandler extends BaseThingHandler {
             logger.error("Error during communication");
             logger.debug("Cause:{}\nException: {}", e.getCause(), e.getStackTrace());
         }
+        entity.purgeEntity();
         updateStatus(ThingStatus.ONLINE);
         int pollerTiming = config.pollInterval;
         pollerClass = new SappPoller(entity, pollerTiming, this);
@@ -130,7 +129,6 @@ public class SinthesiHandler extends BaseThingHandler {
         job = scheduler.schedule(pollerClass::statusPoller, 0, TimeUnit.MILLISECONDS);
         logger.info("Connected with PN MAS");
         logger.info("Channel number: {}", this.getThing().getChannels().size());
-        entity.purgeEntity();
 
         for (Channel c : this.getThing().getChannels()) {
             this.channelLinked(c.getUID());
@@ -148,6 +146,8 @@ public class SinthesiHandler extends BaseThingHandler {
         res.channelKind = Objects.requireNonNull(Objects.requireNonNull(current.getAcceptedItemType()));
         read = new SappVariable(channelSettings.get("read").toString());
         res.sappItemType = read.getVarType();
+        int divider = channelSettings.get("divider") != null ? ((BigDecimal) channelSettings.get("divider")).intValue()
+                : 0;
 
         switch (res.channelKind) {
             case SinthesiBindingConstants.SWITCH:
@@ -165,6 +165,9 @@ public class SinthesiHandler extends BaseThingHandler {
                 res.statusBit = read.getBit();
                 break;
             case SinthesiBindingConstants.NUMBER:
+                res.statusAddr = read.getAddr();
+                res.divider = divider;
+                break;
             case SinthesiBindingConstants.DIMMER:
                 res.statusAddr = read.getAddr();
                 break;
@@ -220,7 +223,7 @@ public class SinthesiHandler extends BaseThingHandler {
             } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.CONTACT)) {
                 entity.addDigitalSappItem(new SappContact(cfg.sappItemType, cfg.statusAddr, cfg.statusBit), channelUID);
             } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.NUMBER)) {
-                entity.addAnalogSappItem(new SappNumber(cfg.sappItemType, cfg.statusAddr), channelUID);
+                entity.addAnalogSappItem(new SappNumber(cfg.sappItemType, cfg.statusAddr, cfg.divider), channelUID);
             } else if (cfg.channelKind.equalsIgnoreCase(SinthesiBindingConstants.ROLLER)) {
                 entity.addDigitalSappItem(new SappRollershutter(cfg.sappItemType, cfg.statusAddr, cfg.statusBit,
                         cfg.upAddr, cfg.upBit, cfg.downAddr, cfg.downBit), channelUID);

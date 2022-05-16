@@ -33,6 +33,7 @@ public class ChannelConfig {
     public int downBit;
     public int onVal;
     public int offVal;
+    public int divider;
 
     public ChannelConfig() {
         channelKind = "";

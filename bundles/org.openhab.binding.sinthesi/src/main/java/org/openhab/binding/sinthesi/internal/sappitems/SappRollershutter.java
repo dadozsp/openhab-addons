@@ -43,6 +43,8 @@ public class SappRollershutter implements ISappDigitalItem {
         this.upBit = upBit;
         this.downAddr = downAddr;
         this.downBit = downBit;
+        value = false;
+        changed = true;
     }
 
     @Override

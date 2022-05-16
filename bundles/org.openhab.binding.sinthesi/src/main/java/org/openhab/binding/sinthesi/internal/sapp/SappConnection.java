@@ -61,7 +61,7 @@ public class SappConnection implements AutoCloseable {
             for (int i = 0; i < RETRY_LIMIT; i++) {
                 while (!masSocket.finishConnect()) {
                     attempt++;
-                    Thread.sleep(10);
+                    Thread.sleep(100);
                     if (attempt > ATTEMPT_LIMIT) {
                         logger.warn("Reached connection attempt limit {} out of {}", i, RETRY_LIMIT);
                         unableToConnect = true;

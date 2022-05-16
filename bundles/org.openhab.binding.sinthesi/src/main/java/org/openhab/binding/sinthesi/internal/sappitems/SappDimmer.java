@@ -33,7 +33,8 @@ public class SappDimmer implements ISappAnalogItem {
     public SappDimmer(String type, int valueAddress) {
         this.type = type;
         this.valueAddress = valueAddress;
-        value = "";
+        value = "0";
+        changed = true;
     }
 
     @Override

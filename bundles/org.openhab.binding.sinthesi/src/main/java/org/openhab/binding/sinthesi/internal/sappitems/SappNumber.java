@@ -26,13 +26,16 @@ import org.eclipse.jdt.annotation.Nullable;
 public class SappNumber implements ISappAnalogItem {
     public String type;
     public int valueAddress;
+    private final int divider;
     public String value;
     private boolean changed;
 
-    public SappNumber(String type, int valueAddress) {
+    public SappNumber(String type, int valueAddress, int divider) {
         this.type = type;
         this.valueAddress = valueAddress;
-        value = "";
+        this.divider = divider;
+        value = "0";
+        changed = true;
     }
 
     @Override
@@ -47,8 +50,15 @@ public class SappNumber implements ISappAnalogItem {
 
     @Override
     public void updateAnalogValue(@Nullable Integer newValue) {
+        assert newValue != null;
         if (!newValue.toString().equals(this.value)) {
-            this.value = newValue.toString();
+            if (divider != 0) {
+                float fVal = (float) newValue / divider;
+                value = Float.toString(fVal);
+            } else {
+                value = newValue.toString();
+            }
+
             changed = true;
         } else {
             changed = false;

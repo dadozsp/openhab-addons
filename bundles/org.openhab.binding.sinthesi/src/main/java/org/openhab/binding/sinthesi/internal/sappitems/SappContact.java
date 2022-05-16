@@ -33,7 +33,8 @@ public class SappContact implements ISappDigitalItem {
         this.type = type;
         this.stateAddress = stateAddress;
         this.stateBit = stateBit;
-        changed = false;
+        this.value = false;
+        changed = true;
     }
 
     @Override

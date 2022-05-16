@@ -73,7 +73,7 @@ public class SappPoller {
 
     public void statusPoller() {
         synchronized (this) {
-            while (pollerActive && !toBeDisposed) {
+            while (pollerActive && !toBeDisposed && handler.getThing().getStatus() == ThingStatus.ONLINE) {
                 if (entity.getSapp().isDead()) {
                     handler.updateThingStatus(ThingStatus.OFFLINE);
                     this.stopPoller();
@@ -84,9 +84,11 @@ public class SappPoller {
 
                     updateDigitalItems();
                     updateAnalogItems();
+
                     runQueuedCommands();
 
                     Thread.sleep(pollerTiming);
+
                 } catch (Exception e) {
                     logger.error("Error while polling for updates");
                     logger.error("Cause: {}\nStack: {}", e.getCause(), e.getStackTrace());
@@ -96,45 +98,50 @@ public class SappPoller {
     }
 
     private void updateDigitalItems() {
-        Map<ChannelUID, ISappDigitalItem> digitalItems;
+        synchronized (this) {
+            Map<ChannelUID, ISappDigitalItem> digitalItems;
 
-        digitalItems = entity.getSappDigitalItems();
+            digitalItems = entity.getSappDigitalItems();
 
-        for (ChannelUID id : digitalItems.keySet()) {
-            if (digitalItems.get(id) instanceof SappSwitch) {
-                if (digitalItems.get(id).hasChanged() && pollerActive) {
-                    handler.updateItemState(id,
-                            (digitalItems.get(id).getDigitalValue()) ? OnOffType.ON : OnOffType.OFF);
+            for (ChannelUID id : digitalItems.keySet()) {
+                if (digitalItems.get(id) instanceof SappSwitch) {
+                    if (digitalItems.get(id).hasChanged() && pollerActive) {
+                        handler.updateItemState(id,
+                                (digitalItems.get(id).getDigitalValue()) ? OnOffType.ON : OnOffType.OFF);
+                    }
+                } else if (digitalItems.get(id) instanceof SappContact) {
+                    if (digitalItems.get(id).hasChanged() && pollerActive) {
+                        handler.updateItemState(id,
+                                (digitalItems.get(id).getDigitalValue()) ? OpenClosedType.OPEN : OpenClosedType.CLOSED);
+                    }
+                } else if (digitalItems.get(id) instanceof SappRollershutter) {
+                    if (digitalItems.get(id).hasChanged() && pollerActive) {
+                        handler.updateItemState(id,
+                                (digitalItems.get(id).getDigitalValue()) ? PercentType.valueOf("100")
+                                        : PercentType.valueOf("0"));
+                    }
+                } else {
+                    logger.warn("Item with channel {} not recognized", id);
                 }
-            } else if (digitalItems.get(id) instanceof SappContact) {
-                if (digitalItems.get(id).hasChanged() && pollerActive) {
-                    handler.updateItemState(id,
-                            (digitalItems.get(id).getDigitalValue()) ? OpenClosedType.OPEN : OpenClosedType.CLOSED);
-                }
-            } else if (digitalItems.get(id) instanceof SappRollershutter) {
-                if (digitalItems.get(id).hasChanged() && pollerActive) {
-                    handler.updateItemState(id, (digitalItems.get(id).getDigitalValue()) ? PercentType.valueOf("100")
-                            : PercentType.valueOf("0"));
-                }
-            } else {
-                logger.warn("Item with channel {} not recognized", id);
             }
         }
     }
 
     private void updateAnalogItems() {
-        Map<ChannelUID, ISappAnalogItem> analogItems;
+        synchronized (this) {
+            Map<ChannelUID, ISappAnalogItem> analogItems;
 
-        analogItems = entity.getSappAnalogItems();
+            analogItems = entity.getSappAnalogItems();
 
-        for (ChannelUID id : analogItems.keySet()) {
-            if (analogItems.get(id) instanceof SappNumber) {
-                if (analogItems.get(id).hasChanged()) {
-                    handler.updateItemState(id, DecimalType.valueOf((analogItems.get(id)).getAnalogValue()));
-                }
-            } else if (analogItems.get(id) instanceof SappDimmer) {
-                if (analogItems.get(id).hasChanged()) {
-                    handler.updateItemState(id, PercentType.valueOf(analogItems.get(id).getAnalogValue()));
+            for (ChannelUID id : analogItems.keySet()) {
+                if (analogItems.get(id) instanceof SappNumber) {
+                    if (analogItems.get(id).hasChanged()) {
+                        handler.updateItemState(id, DecimalType.valueOf((analogItems.get(id)).getAnalogValue()));
+                    }
+                } else if (analogItems.get(id) instanceof SappDimmer) {
+                    if (analogItems.get(id).hasChanged()) {
+                        handler.updateItemState(id, PercentType.valueOf(analogItems.get(id).getAnalogValue()));
+                    }
                 }
             }
         }
@@ -143,7 +150,8 @@ public class SappPoller {
     private void runQueuedCommands() {
         synchronized (this) {
             List<CommandQueue> queue = entity.getCommandQueues();
-            for (CommandQueue elem : entity.getCommandQueues()) {
+            // Collections.reverse(queue); // Run commands from first received through last
+            for (CommandQueue elem : queue) {
                 if (elem.command == SetVirtual.class) {
                     try {
                         entity.getSapp().sappSetVirtual(elem.address, elem.value.intValue());

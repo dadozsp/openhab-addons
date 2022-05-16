@@ -152,6 +152,7 @@ public class SappEntity {
     }
 
     public void addToQueue(CommandQueue command) {
+
         commandQueues.add(command);
     }
 
@@ -243,7 +244,6 @@ public class SappEntity {
                     }
                 } else {
                     usedVirtual.put(k, sapp.sappGetVirtual(k));
-                    logger.debug("First value: {}->{}", k, usedVirtual.get(k));
                 }
             }
         } catch (Exception e) {

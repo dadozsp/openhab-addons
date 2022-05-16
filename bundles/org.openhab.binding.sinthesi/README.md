@@ -48,6 +48,7 @@ Each item must have a defined channel with the following syntax.
 ### Number
 
 **read**: Defines the input/output or virtual variables that represents the status of the switch, e.g. read="V:10"<br/>
+**divider**: Defines a divider for this item.<br/>
 
 ### Rollershutter
 
@@ -73,7 +74,7 @@ sinthesi:pnmas:1 [ ip="192.168.123.137", port="7001", pollInterval=100 ] {
         Switch : sw1 [read="O:1:1", write="V:1000:1", onValue=1, offValue=1]
         Contact : ct1 [read="O:2:1"]
         Dimmer : dm1 [read="V:10"]
-        Number : nb1 [read="V:30"]
+        Number : nb1 [read="V:30", divider=10]
         Rollershutter : rs1 [read="V:40:1", up="V:1000:1", down="V:1000:2"]
 }
 ```

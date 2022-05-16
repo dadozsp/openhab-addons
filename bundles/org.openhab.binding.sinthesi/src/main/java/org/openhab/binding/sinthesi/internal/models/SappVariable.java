@@ -37,7 +37,7 @@ public class SappVariable {
         String[] param = variable.split(":");
 
         if (param.length < 2 || param.length > 3)
-            throw new IllegalArgumentException("Invalid variable received");
+            throw new IllegalArgumentException("Invalid variable received: " + variable);
 
         VarType = param[0];
         Address = Integer.parseInt(param[1]);

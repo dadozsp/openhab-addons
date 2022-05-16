@@ -43,7 +43,8 @@ public class SappSwitch implements ISappDigitalItem {
         this.trgBit = trgBit;
         this.onVal = onVal;
         this.offVal = offVal;
-        changed = false;
+        value = false;
+        changed = true;
     }
 
     @Override
@@ -81,7 +82,6 @@ public class SappSwitch implements ISappDigitalItem {
 
     @Override
     public String getType() {
-        assert type != null;
         return type;
     }
 
