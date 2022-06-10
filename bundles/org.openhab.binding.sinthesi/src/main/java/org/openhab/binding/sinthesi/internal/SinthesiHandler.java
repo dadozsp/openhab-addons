@@ -14,8 +14,6 @@ package org.openhab.binding.sinthesi.internal;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,6 +31,7 @@ import org.openhab.binding.sinthesi.internal.sapp.commands.SetVirtual;
 import org.openhab.binding.sinthesi.internal.sappitems.*;
 import org.openhab.core.config.core.Configuration;
 import org.openhab.core.library.types.DecimalType;
+import org.openhab.core.library.types.OnOffType;
 import org.openhab.core.library.types.UpDownType;
 import org.openhab.core.thing.Channel;
 import org.openhab.core.thing.ChannelUID;
@@ -74,7 +73,37 @@ public class SinthesiHandler extends BaseThingHandler {
         if (entity.getSappDigitalItems().get(channelUID) != null && SinthesiBindingConstants.SWITCH
                 .equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
             SappSwitch item = (SappSwitch) entity.getSappDigitalItems().get(channelUID);
-            entity.addToQueue(new CommandQueue(SetVirtual.class, item.trgAddr, (int) Math.pow(2, item.trgBit - 1)));
+            if (command == OnOffType.ON) {
+                if (item.onVal == 1) {
+                    entity.addToQueue(
+                            new CommandQueue(SetVirtual.class, item.trgAddr, (int) Math.pow(2, item.trgBit - 1)));
+                } else {
+                    /*
+                     * int value = item.moduleValue - (int) Math.pow(2, item.trgBit - 1);
+                     * if (value >= 0) {
+                     * entity.addToQueue(new CommandQueue(SetVirtual.class, item.trgAddr, value));
+                     * } else {
+                     * logger.warn("Negative value received on channel {}, ignored", channelUID);
+                     * }
+                     */
+                    logger.warn("The offValue 0 is not yet supported");
+                }
+            } else {
+                if (item.offVal == 1) {
+                    entity.addToQueue(
+                            new CommandQueue(SetVirtual.class, item.trgAddr, (int) Math.pow(2, item.trgBit - 1)));
+                } else {
+                    /*
+                     * int value = item.moduleValue - (int) Math.pow(2, item.trgBit - 1);
+                     * if (value >= 0) {
+                     * entity.addToQueue(new CommandQueue(SetVirtual.class, item.trgAddr, value));
+                     * } else {
+                     * logger.warn("Negative value received on channell {}, ignored", channelUID);
+                     * }
+                     */
+                    logger.warn("The offValue 0 is not yet supported");
+                }
+            }
 
         } else if (entity.getSappDigitalItems().get(channelUID) != null && SinthesiBindingConstants.ROLLER
                 .equals(entity.getSappDigitalItems().get(channelUID).getItemString())) {
@@ -91,12 +120,9 @@ public class SinthesiHandler extends BaseThingHandler {
                 .equals(entity.getSappAnalogItems().get(channelUID).getItemString())) {
             SappNumber number = (SappNumber) entity.getSappAnalogItems().get(channelUID);
             float comm = ((DecimalType) command).floatValue();
-            try {
-                entity.addToQueue(new CommandQueue(SetVirtual.class, number.valueAddress,
-                        NumberFormat.getInstance().parse(Float.toString(comm))));
-            } catch (ParseException e) {
-                logger.error("Error parsing command {}", command);
-            }
+            entity.addToQueue(new CommandQueue(SetVirtual.class, number.valueAddress,
+                    (number.divider != 0) ? (int)(comm * number.divider) : (int)comm));
+
         } else if (entity.getSappAnalogItems().get(channelUID) != null && SinthesiBindingConstants.DIMMER
                 .equals(entity.getSappAnalogItems().get(channelUID).getItemString())) {
             SappDimmer dimmer = (SappDimmer) entity.getSappAnalogItems().get(channelUID);

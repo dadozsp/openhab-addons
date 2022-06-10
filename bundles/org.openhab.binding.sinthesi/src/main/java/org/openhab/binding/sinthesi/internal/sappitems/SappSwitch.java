@@ -92,8 +92,6 @@ public class SappSwitch implements ISappDigitalItem {
             this.value = newVal;
             this.moduleValue = value;
             changed = true;
-        } else {
-            changed = false;
         }
     }
 

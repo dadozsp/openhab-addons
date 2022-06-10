@@ -54,8 +54,6 @@ public class SappDimmer implements ISappAnalogItem {
             if (!dimmValue.equals(this.value)) {
                 this.value = dimmValue;
                 changed = true;
-            } else {
-                changed = false;
             }
         }
     }

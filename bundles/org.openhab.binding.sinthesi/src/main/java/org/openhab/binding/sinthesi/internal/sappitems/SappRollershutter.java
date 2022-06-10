@@ -78,8 +78,6 @@ public class SappRollershutter implements ISappDigitalItem {
         if (newVal != this.value) {
             this.value = newVal;
             changed = true;
-        } else {
-            changed = false;
         }
     }
 

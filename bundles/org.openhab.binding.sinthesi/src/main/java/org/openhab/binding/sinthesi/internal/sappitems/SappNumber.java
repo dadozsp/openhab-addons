@@ -26,7 +26,7 @@ import org.eclipse.jdt.annotation.Nullable;
 public class SappNumber implements ISappAnalogItem {
     public String type;
     public int valueAddress;
-    private final int divider;
+    public final int divider;
     public String value;
     private boolean changed;
 
@@ -60,8 +60,6 @@ public class SappNumber implements ISappAnalogItem {
             }
 
             changed = true;
-        } else {
-            changed = false;
         }
     }
 

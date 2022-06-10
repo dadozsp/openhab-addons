@@ -39,7 +39,9 @@ Each item must have a defined channel with the following syntax.
 **onValue**: The value sent when an ON command is received<br/>
 **offValue**: The value sent when an OFF command is received<br/>
 
-**Note**: At this moment the only supported value for the switch onValue and offValue is 1 (other value will be added in a future update) on both the on and off value, it's suggested that the trigger variable gets set by the binding and then is set back to 0 by the control unit with a dedicated macro (shown below)
+**Note**: At this moment the only supported value for the switch onValue and offValue is 1 
+(other value will be added in a future update) on both the on and off value, it's suggested that the trigger variable 
+gets set by the binding and then is set back to 0 by the control unit with a dedicated macro (shown below)
 
 ### Contact
 
@@ -113,4 +115,11 @@ MACRO AutoResetFlagPC(p_virtualePC, p_virtualeMemo)
         p_virtualePC = 0;
     ENDIF
 }
+```
+
+An alternative to this macro is to reset the command variable immediately after.
+
+```
+O1.1 = T[V1.1];
+V1.1 = OFF;
 ```

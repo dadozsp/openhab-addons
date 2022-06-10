@@ -135,11 +135,11 @@ public class SappPoller {
 
             for (ChannelUID id : analogItems.keySet()) {
                 if (analogItems.get(id) instanceof SappNumber) {
-                    if (analogItems.get(id).hasChanged()) {
+                    if (analogItems.get(id).hasChanged() && pollerActive) {
                         handler.updateItemState(id, DecimalType.valueOf((analogItems.get(id)).getAnalogValue()));
                     }
                 } else if (analogItems.get(id) instanceof SappDimmer) {
-                    if (analogItems.get(id).hasChanged()) {
+                    if (analogItems.get(id).hasChanged() && pollerActive) {
                         handler.updateItemState(id, PercentType.valueOf(analogItems.get(id).getAnalogValue()));
                     }
                 }
